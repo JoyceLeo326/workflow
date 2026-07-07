@@ -89,6 +89,7 @@ const tabs: Array<{ id: ResultTab; label: string }> = [
 ];
 
 const BROWSER_DEMO_PREFIX = "demo-";
+const IS_BROWSER_DEMO_MODE = process.env.NEXT_PUBLIC_BROWSER_DEMO === "1";
 
 function formatDuration(seconds: number) {
   const minutes = Math.floor(seconds / 60);
@@ -416,6 +417,10 @@ export function Workbench() {
   }, [steps]);
 
   useEffect(() => {
+    if (IS_BROWSER_DEMO_MODE) {
+      return;
+    }
+
     fetch("/api/projects")
       .then((response) => response.json())
       .then((payload: { projects?: Project[] }) => {
@@ -436,6 +441,25 @@ export function Workbench() {
   async function handleFile(file: File) {
     setIsUploading(true);
     setMessage("正在解析文件");
+
+    if (IS_BROWSER_DEMO_MODE) {
+      try {
+        if (!file.name.toLowerCase().endsWith(".txt")) {
+          throw new Error("公网演示支持 TXT 上传；DOCX 请在本地模式解析。");
+        }
+        setSourceText(await file.text());
+        if (!title.trim() || title === "雨夜归途") {
+          setTitle(file.name.replace(/\.txt$/i, ""));
+        }
+        setMessage("文件解析完成");
+      } catch (error) {
+        setMessage(error instanceof Error ? error.message : "文件解析失败");
+      } finally {
+        setIsUploading(false);
+      }
+      return;
+    }
+
     const form = new FormData();
     form.append("file", file);
 
@@ -461,6 +485,16 @@ export function Workbench() {
     setIsRunning(true);
     setMessage("正在创建项目");
     setSteps(createInitialSteps());
+
+    if (IS_BROWSER_DEMO_MODE) {
+      const demoProject = createBrowserDemoProject(title, sourceText, model);
+      mergeProject(demoProject);
+      setSteps(demoProject.steps);
+      setActiveTab("structure");
+      setMessage("已生成本地演示结果");
+      setIsRunning(false);
+      return;
+    }
 
     try {
       const createResponse = await fetch("/api/projects", {
