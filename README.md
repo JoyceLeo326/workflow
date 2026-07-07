@@ -11,6 +11,7 @@
 - 导出：Markdown、JSON、CSV
 - 模型接入：DeepSeek / OpenAI-compatible Chat Completions
 - 无 Key 演示：未配置 API Key 时自动使用本地 fallback 生成完整示例结果
+- 公网演示模式：服务端 API 或临时存储不可用时，前端会自动生成浏览器本地演示结果
 - 合规复刻矩阵：展示公开开源灵感来源、许可证、差异化重写点和不复制策略
 
 ## 技术栈
@@ -38,6 +39,8 @@ OPENAI_API_KEY=your_api_key
 OPENAI_BASE_URL=https://api.deepseek.com/v1
 OPENAI_MODEL=deepseek-chat
 ```
+
+部署到无持久文件系统的平台时仍可体验核心流程：点击“开始改剧”后，如果服务端项目存储不可用，页面会自动切换到浏览器本地演示模式，不需要 API Key 或付费服务。
 
 ## 测试与构建
 

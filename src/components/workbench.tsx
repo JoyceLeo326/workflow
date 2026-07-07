@@ -28,6 +28,8 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react";
 import { INSPIRATION_SOURCES } from "@/lib/inspiration/sources";
 import { createInitialSteps } from "@/lib/workflow/agents";
+import { exportProjectAsCsv, exportProjectAsJson, exportProjectAsMarkdown } from "@/lib/workflow/exporters";
+import { buildFallbackWorkflowResult } from "@/lib/workflow/fallback";
 import type {
   AgentStep,
   CharacterCard,
@@ -39,6 +41,7 @@ import type {
 } from "@/lib/workflow/types";
 
 type ResultTab = "structure" | "characters" | "scenes" | "shots" | "timeline";
+type ExportFormat = "md" | "json" | "csv";
 
 type NavItem = {
   label: string;
@@ -84,6 +87,8 @@ const tabs: Array<{ id: ResultTab; label: string }> = [
   { id: "shots", label: "分镜大纲" },
   { id: "timeline", label: "成片预演" },
 ];
+
+const BROWSER_DEMO_PREFIX = "demo-";
 
 function formatDuration(seconds: number) {
   const minutes = Math.floor(seconds / 60);
@@ -283,6 +288,62 @@ function TimelineView({ items, total }: { items?: TimelineItem[]; total?: number
   );
 }
 
+function createCompletedSteps(): AgentStep[] {
+  const now = new Date().toISOString();
+  return createInitialSteps().map((step) => ({
+    ...step,
+    status: "completed",
+    progress: 100,
+    startedAt: now,
+    completedAt: now,
+  }));
+}
+
+function createBrowserDemoProject(title: string, sourceText: string, model: string): Project {
+  const now = new Date().toISOString();
+  const safeTitle = title.trim() || "未命名项目";
+  return {
+    id: `${BROWSER_DEMO_PREFIX}${globalThis.crypto?.randomUUID?.() ?? now}`,
+    title: safeTitle,
+    sourceText: sourceText.trim(),
+    status: "completed",
+    modelConfig: { model },
+    steps: createCompletedSteps(),
+    results: buildFallbackWorkflowResult({ title: safeTitle, sourceText }),
+    createdAt: now,
+    updatedAt: now,
+  };
+}
+
+function isBrowserDemoProject(project: Project): boolean {
+  return project.id.startsWith(BROWSER_DEMO_PREFIX);
+}
+
+function downloadTextFile(filename: string, contentType: string, content: string) {
+  const blob = new Blob([content], { type: `${contentType};charset=utf-8` });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.append(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
+}
+
+function exportBrowserDemoProject(project: Project, format: ExportFormat) {
+  const baseName = project.title.trim() || "workflow-project";
+  if (format === "json") {
+    downloadTextFile(`${baseName}.json`, "application/json", exportProjectAsJson(project));
+    return;
+  }
+  if (format === "csv") {
+    downloadTextFile(`${baseName}.csv`, "text/csv", exportProjectAsCsv(project));
+    return;
+  }
+  downloadTextFile(`${baseName}.md`, "text/markdown", exportProjectAsMarkdown(project));
+}
+
 function InspirationMatrix() {
   return (
     <section className="mt-4">
@@ -457,15 +518,23 @@ export function Workbench() {
           }
         }
       }
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "工作流运行失败");
+    } catch {
+      const demoProject = createBrowserDemoProject(title, sourceText, model);
+      mergeProject(demoProject);
+      setSteps(demoProject.steps);
+      setActiveTab("structure");
+      setMessage("已生成本地演示结果");
     } finally {
       setIsRunning(false);
     }
   }
 
-  function exportProject(format: "md" | "json" | "csv") {
+  function exportProject(format: ExportFormat) {
     if (!project) return;
+    if (isBrowserDemoProject(project)) {
+      exportBrowserDemoProject(project, format);
+      return;
+    }
     window.location.assign(`/api/projects/${project.id}/export?format=${format}`);
   }
 
