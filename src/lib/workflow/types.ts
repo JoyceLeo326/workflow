@@ -1,0 +1,140 @@
+export type ProjectStatus = "draft" | "running" | "completed" | "failed";
+export type AgentStepStatus = "waiting" | "running" | "completed" | "failed";
+
+export type AgentKey =
+  | "novel-analyst"
+  | "script-adapter"
+  | "character-extractor"
+  | "scene-extractor"
+  | "storyboard-artist"
+  | "frame-prompt-engineer"
+  | "director";
+
+export type ModelConfig = {
+  baseUrl?: string;
+  model?: string;
+};
+
+export type AgentDefinition = {
+  id: AgentKey;
+  name: string;
+  description: string;
+};
+
+export type AgentStep = AgentDefinition & {
+  status: AgentStepStatus;
+  progress: number;
+  startedAt?: string;
+  completedAt?: string;
+  error?: string;
+};
+
+export type ScriptAct = {
+  name: string;
+  purpose: string;
+  beats: string[];
+};
+
+export type ScriptStructure = {
+  title: string;
+  logline: string;
+  genre: string;
+  themes: string[];
+  acts: ScriptAct[];
+};
+
+export type CharacterCard = {
+  id: string;
+  name: string;
+  role: string;
+  profile: string;
+  goal: string;
+  relationship: string;
+  visualPrompt: string;
+};
+
+export type SceneCard = {
+  id: string;
+  name: string;
+  time: string;
+  location: string;
+  mood: string;
+  keyEvents: string[];
+  visualPrompt: string;
+};
+
+export type ShotCard = {
+  id: string;
+  shotNumber: string;
+  sceneId: string;
+  scene: string;
+  visual: string;
+  shotSize: string;
+  cameraMove: string;
+  narration: string;
+  subtitle: string;
+  durationSeconds: number;
+  firstFramePrompt: string;
+  lastFramePrompt: string;
+};
+
+export type TimelineItem = {
+  shotNumber: string;
+  startSeconds: number;
+  endSeconds: number;
+  subtitle: string;
+  narration: string;
+  visualPrompt: string;
+};
+
+export type TimelinePreview = {
+  totalDurationSeconds: number;
+  items: TimelineItem[];
+  narrationTrack: string[];
+  subtitleTrack: string[];
+  visualPromptTrack: string[];
+};
+
+export type DirectorNotes = {
+  summary: string;
+  qualityChecks: string[];
+  nextSteps: string[];
+};
+
+export type WorkflowResults = {
+  scriptStructure: ScriptStructure;
+  characters: CharacterCard[];
+  scenes: SceneCard[];
+  shots: ShotCard[];
+  timeline: TimelinePreview;
+  directorNotes: DirectorNotes;
+};
+
+export type Project = {
+  id: string;
+  title: string;
+  sourceText: string;
+  status: ProjectStatus;
+  modelConfig: ModelConfig;
+  steps: AgentStep[];
+  results?: WorkflowResults;
+  error?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CreateProjectInput = {
+  title: string;
+  sourceText: string;
+  modelConfig?: ModelConfig;
+};
+
+export type WorkflowInput = {
+  title: string;
+  sourceText: string;
+};
+
+export type RunEvent =
+  | { type: "step"; step: AgentStep; project?: Project }
+  | { type: "complete"; project: Project }
+  | { type: "error"; error: string; project?: Project };
