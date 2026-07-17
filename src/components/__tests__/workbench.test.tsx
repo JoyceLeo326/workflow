@@ -7,14 +7,18 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
+function mockEmptyProjects() {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockResolvedValue({
+      json: async () => ({ projects: [] }),
+    }),
+  );
+}
+
 describe("Workbench", () => {
-  it("renders the workstation navigation, input area, agent lane, and result tabs", () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockResolvedValue({
-        json: async () => ({ projects: [] }),
-      }),
-    );
+  it("renders the workstation navigation, input area, agent lane, mobile affordances, and result tabs", () => {
+    mockEmptyProjects();
 
     render(<Workbench />);
 
@@ -28,6 +32,22 @@ describe("Workbench", () => {
     expect(screen.getByText("cline/cline")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "剧本结构" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "成片预演" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "打开导航" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "载入示例" })).toBeInTheDocument();
+    expect(screen.getByText("移动端已适配")).toBeInTheDocument();
+    expect(screen.getByText("MVP 完整度")).toBeInTheDocument();
+  });
+
+  it("loads a polished sample script for quick mobile trials", () => {
+    mockEmptyProjects();
+
+    render(<Workbench />);
+
+    fireEvent.click(screen.getByRole("button", { name: "载入示例" }));
+
+    const textarea = screen.getByPlaceholderText("粘贴小说文本内容...") as HTMLTextAreaElement;
+    expect(textarea.value).toContain("废弃剧院");
+    expect(screen.getByRole("button", { name: "开始改剧" })).toBeEnabled();
   });
 
   it("generates a complete browser demo when the project API is unavailable", async () => {
