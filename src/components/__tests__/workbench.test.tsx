@@ -36,6 +36,11 @@ describe("Workbench", () => {
     expect(screen.getByRole("button", { name: "载入示例" })).toBeInTheDocument();
     expect(screen.getByText("移动端已适配")).toBeInTheDocument();
     expect(screen.getByText("MVP 完整度")).toBeInTheDocument();
+    expect(screen.getByText("零成本模式")).toBeInTheDocument();
+    expect(screen.getByText("Provider：未连接")).toBeInTheDocument();
+    expect(screen.getByText("无自动扣费")).toBeInTheDocument();
+    expect(screen.getByText("本地规则演示，不是 AI 生成")).toBeInTheDocument();
+    expect(screen.getByText("图片 / TTS / 视频需连接用户或机构 Provider")).toBeInTheDocument();
   });
 
   it("loads a polished sample script for quick mobile trials", () => {
@@ -72,7 +77,7 @@ describe("Workbench", () => {
     fireEvent.click(screen.getByRole("button", { name: "开始改剧" }));
 
     await waitFor(() => {
-      expect(screen.getByText("已生成本地演示结果")).toBeInTheDocument();
+      expect(screen.getByText("已生成本地规则演示（不是 AI 生成）")).toBeInTheDocument();
     });
     expect(screen.getByText("悬疑剧情短剧")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "MD" })).not.toBeDisabled();

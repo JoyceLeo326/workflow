@@ -196,10 +196,15 @@ export function buildFallbackWorkflowResult(input: WorkflowInput): WorkflowResul
       summary: `已将《${title}》整理为约 ${timeline.totalDurationSeconds} 秒的短剧分镜预演。`,
       qualityChecks: [
         "已生成剧本结构、角色、场景、分镜和成片预演。",
+        "本地规则演示，不是 AI 生成。",
         "每个镜头包含景别、运镜、旁白、字幕、时长和首尾帧提示词。",
         "第一版为可编辑草案，适合继续接入真实图片、配音和剪辑工具。",
       ],
-      nextSteps: ["人工调整角色姓名", "补充真实场景素材", "接入图片/配音/剪辑 API"],
+      nextSteps: [
+        "人工调整角色姓名",
+        "补充真实场景素材",
+        "连接用户或机构自有 Provider 后再生成图片、配音或视频",
+      ],
     },
   };
 }

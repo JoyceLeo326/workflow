@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 const title = "创剧AI - 小说改剧工作流";
 const description =
-  "将小说改编为剧本、角色、场景、分镜和成片预演的 AI 工作流，无需 API Key 即可体验完整浏览器演示。";
+  "用确定性本地规则整理剧本、角色、场景、分镜和成片预演；无需 API Key，演示结果不是 AI 生成。";
 
 export const metadata: Metadata = {
   applicationName: "创剧AI",

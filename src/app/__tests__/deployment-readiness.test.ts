@@ -51,18 +51,78 @@ describe("public deployment readiness", () => {
 
     const previousVercel = process.env.VERCEL;
     const previousBrowserDemo = process.env.NEXT_PUBLIC_BROWSER_DEMO;
+    const previousCostMode = process.env.COST_MODE;
     process.env.VERCEL = "1";
     delete process.env.NEXT_PUBLIC_BROWSER_DEMO;
+    delete process.env.COST_MODE;
     vi.resetModules();
 
     try {
       const { default: nextConfig } = await import("../../../next.config");
-      expect(nextConfig.env).toMatchObject({ NEXT_PUBLIC_BROWSER_DEMO: "1" });
+      expect(nextConfig.env).toMatchObject({
+        NEXT_PUBLIC_BROWSER_DEMO: "1",
+        NEXT_PUBLIC_COST_MODE: "zero_owner_cost",
+        NEXT_PUBLIC_PROVIDER_STATUS: "not_connected",
+      });
     } finally {
       if (previousVercel === undefined) delete process.env.VERCEL;
       else process.env.VERCEL = previousVercel;
       if (previousBrowserDemo === undefined) delete process.env.NEXT_PUBLIC_BROWSER_DEMO;
       else process.env.NEXT_PUBLIC_BROWSER_DEMO = previousBrowserDemo;
+      if (previousCostMode === undefined) delete process.env.COST_MODE;
+      else process.env.COST_MODE = previousCostMode;
+      vi.resetModules();
+    }
+  });
+
+  it("documents the zero-owner-cost default and external-provider boundaries", () => {
+    const environmentExample = readFileSync(join(projectRoot, ".env.example"), "utf8");
+    const policyPath = join(projectRoot, "docs/zero-owner-cost.md");
+
+    expect(environmentExample).toMatch(/^COST_MODE=zero_owner_cost$/m);
+    expect(existsSync(policyPath)).toBe(true);
+    if (!existsSync(policyPath)) return;
+
+    const policy = readFileSync(policyPath, "utf8");
+    for (const marker of [
+      "BYOK",
+      "BYOS",
+      "BYOI",
+      "https://developers.cloudflare.com/pages/platform/limits/",
+      "https://developers.cloudflare.com/workers/platform/pricing/",
+      "https://vercel.com/legal/terms",
+      "个人、非商业",
+      "配额数字会变化",
+    ]) {
+      expect(policy).toContain(marker);
+    }
+  });
+
+  it("does not advertise a provider as ready when its quota cannot be verified", async () => {
+    const keys = [
+      "AI_PROVIDER_OWNERSHIP",
+      "AI_PROVIDER_QUOTA_LIMIT",
+      "AI_PROVIDER_QUOTA_USED",
+      "AI_PROVIDER_QUOTA_RESET_AT",
+      "OPENAI_API_KEY",
+    ] as const;
+    const previous = Object.fromEntries(keys.map((key) => [key, process.env[key]]));
+    process.env.AI_PROVIDER_OWNERSHIP = "user";
+    process.env.OPENAI_API_KEY = "user-test-key";
+    delete process.env.AI_PROVIDER_QUOTA_LIMIT;
+    delete process.env.AI_PROVIDER_QUOTA_USED;
+    delete process.env.AI_PROVIDER_QUOTA_RESET_AT;
+    vi.resetModules();
+
+    try {
+      const { default: nextConfig } = await import("../../../next.config");
+      expect(nextConfig.env).toMatchObject({ NEXT_PUBLIC_PROVIDER_STATUS: "blocked" });
+    } finally {
+      for (const key of keys) {
+        const value = previous[key];
+        if (value === undefined) delete process.env[key];
+        else process.env[key] = value;
+      }
       vi.resetModules();
     }
   });

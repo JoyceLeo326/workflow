@@ -97,6 +97,10 @@ const tabs: Array<{ id: ResultTab; label: string }> = [
 
 const BROWSER_DEMO_PREFIX = "demo-";
 const IS_BROWSER_DEMO_MODE = process.env.NEXT_PUBLIC_BROWSER_DEMO === "1";
+const IS_ZERO_OWNER_COST_MODE =
+  (process.env.NEXT_PUBLIC_COST_MODE ?? "zero_owner_cost") === "zero_owner_cost";
+const PROVIDER_STATUS = process.env.NEXT_PUBLIC_PROVIDER_STATUS ?? "not_connected";
+const IS_PROVIDER_READY = PROVIDER_STATUS === "ready";
 const SAMPLE_TITLE = "雨夜归途";
 const SAMPLE_SOURCE_TEXT =
   "雨夜，林澈回到旧城，发现父亲留下的录音。好友阿岚提醒他别追查，但他决定去废弃剧院寻找真相。剧院深处，一盏旧灯忽然亮起，录音里传出母亲的名字。黑衣人现身阻止他，阿岚被迫说出当年的秘密。黎明前，林澈站上废弃舞台，终于明白父亲真正想保护的人是谁。";
@@ -272,7 +276,7 @@ function TimelineView({ items, total }: { items?: TimelineItem[]; total?: number
           </div>
         </div>
         <div className="rounded-md bg-emerald-50 px-3 py-2 text-xs font-medium text-emerald-700">
-          可继续接入图片、配音、剪辑 API
+          连接自有 Provider 后可生成媒体
         </div>
       </div>
       <div className="space-y-2">
@@ -431,7 +435,7 @@ function MobileNavigation({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
             </div>
             <div>
               <div className="text-base font-semibold">创剧AI</div>
-              <div className="text-xs text-slate-500">智能视频生成工作流</div>
+              <div className="text-xs text-slate-500">本地规则改剧工作流</div>
             </div>
           </div>
           <button
@@ -520,6 +524,32 @@ function MetricStrip({
   );
 }
 
+function CostBoundaryNotice() {
+  return (
+    <section
+      aria-label="成本与能力边界"
+      className="rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-amber-950"
+    >
+      <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
+        <span className="rounded-md bg-white px-2 py-1">零成本模式</span>
+        <span className="rounded-md bg-white px-2 py-1">
+          Provider：
+          {IS_PROVIDER_READY
+            ? "用户或机构已连接"
+            : PROVIDER_STATUS === "blocked"
+              ? "已连接，配额未通过"
+              : "未连接"}
+        </span>
+        <span className="rounded-md bg-white px-2 py-1">无自动扣费</span>
+      </div>
+      <p className="mt-2 text-sm font-medium">本地规则演示，不是 AI 生成</p>
+      <p className="mt-1 text-xs leading-5 text-amber-800">
+        图片 / TTS / 视频需连接用户或机构 Provider
+      </p>
+    </section>
+  );
+}
+
 function MvpCompleteness({ project, progress }: { project: Project | null; progress: number }) {
   const hasResults = Boolean(project?.results);
   const checklist = [
@@ -535,7 +565,7 @@ function MvpCompleteness({ project, progress }: { project: Project | null; progr
     },
     {
       label: "本地演示 fallback",
-      description: "模型或 API 暂不可用时仍能生成完整结构化样例。",
+      description: "不调用模型，使用确定性本地规则生成结构化样例。",
       done: true,
     },
     {
@@ -580,7 +610,7 @@ function MvpCompleteness({ project, progress }: { project: Project | null; progr
 export function Workbench() {
   const [title, setTitle] = useState("雨夜归途");
   const [sourceText, setSourceText] = useState("");
-  const [model, setModel] = useState("deepseek-chat");
+  const [model, setModel] = useState(IS_PROVIDER_READY ? "deepseek-chat" : "local-rules");
   const [projects, setProjects] = useState<Project[]>([]);
   const [project, setProject] = useState<Project | null>(null);
   const [steps, setSteps] = useState<AgentStep[]>(createInitialSteps());
@@ -679,7 +709,7 @@ export function Workbench() {
       mergeProject(demoProject);
       setSteps(demoProject.steps);
       setActiveTab("structure");
-      setMessage("已生成本地演示结果");
+      setMessage("已生成本地规则演示（不是 AI 生成）");
       setIsRunning(false);
       return;
     }
@@ -732,7 +762,9 @@ export function Workbench() {
             setMessage(`${event.step.name}：${event.step.status === "completed" ? "完成" : "处理中"}`);
           }
           if (event.type === "complete") {
-            setMessage("工作流完成");
+            setMessage(
+              IS_PROVIDER_READY ? "工作流完成" : "本地规则工作流完成（不是 AI 生成）",
+            );
             setActiveTab("structure");
           }
           if (event.type === "error") {
@@ -745,7 +777,7 @@ export function Workbench() {
       mergeProject(demoProject);
       setSteps(demoProject.steps);
       setActiveTab("structure");
-      setMessage("已生成本地演示结果");
+      setMessage("已生成本地规则演示（不是 AI 生成）");
     } finally {
       setIsRunning(false);
     }
@@ -779,7 +811,7 @@ export function Workbench() {
           </div>
           <div>
             <div className="text-base font-semibold">创剧AI</div>
-            <div className="text-xs text-slate-500">智能视频生成工作流</div>
+            <div className="text-xs text-slate-500">本地规则改剧工作流</div>
           </div>
         </div>
         <nav className="flex-1 overflow-y-auto px-3 py-4">
@@ -859,12 +891,23 @@ export function Workbench() {
               className="h-10 min-w-0 flex-1 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-blue-500 sm:flex-none"
               value={model}
               onChange={(event) => setModel(event.target.value)}
+              disabled={IS_ZERO_OWNER_COST_MODE && !IS_PROVIDER_READY}
             >
-              <option value="deepseek-chat">DeepSeek - 通用推理</option>
-              <option value="deepseek-reasoner">DeepSeek - 深度推理</option>
+              {IS_PROVIDER_READY ? (
+                <>
+                  <option value="deepseek-chat">DeepSeek - 通用推理</option>
+                  <option value="deepseek-reasoner">DeepSeek - 深度推理</option>
+                </>
+              ) : (
+                <option value="local-rules">本地规则演示（非 AI）</option>
+              )}
             </select>
           </div>
         </header>
+
+        <div className="bg-white px-4 pt-4 lg:px-6">
+          <CostBoundaryNotice />
+        </div>
 
         <div className="grid flex-1 gap-0 lg:grid-cols-[48%_52%]">
           <section className="border-b border-slate-200 bg-white p-4 lg:border-b-0 lg:border-r lg:p-6">

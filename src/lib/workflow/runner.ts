@@ -4,6 +4,12 @@ import { buildFallbackWorkflowResult } from "./fallback";
 import { callOpenAiCompatibleJson } from "./model-client";
 import { buildWorkflowMessages } from "./prompts";
 import { workflowResultsSchema } from "./schemas";
+import {
+  evaluateCostPolicy,
+  resolveCostMode,
+  type ProviderBillingOwner,
+  type QuotaWindow,
+} from "@/lib/cost/policy";
 import { getProject, updateProject } from "@/lib/storage/project-store";
 import type { AgentStep, Project, RunEvent, WorkflowResults } from "./types";
 
@@ -15,6 +21,24 @@ function runtimeModelConfig(project: Project) {
     apiKey: process.env.OPENAI_API_KEY,
     baseUrl: project.modelConfig.baseUrl || process.env.OPENAI_BASE_URL || DEFAULT_BASE_URL,
     model: project.modelConfig.model || process.env.OPENAI_MODEL || DEFAULT_MODEL,
+  };
+}
+
+function providerBillingOwner(value: string | undefined): ProviderBillingOwner {
+  return value === "project" || value === "user" || value === "institution" ? value : "none";
+}
+
+function providerQuotaFromEnvironment(): QuotaWindow | undefined {
+  const limit = process.env.AI_PROVIDER_QUOTA_LIMIT;
+  const used = process.env.AI_PROVIDER_QUOTA_USED;
+  const resetsAt = process.env.AI_PROVIDER_QUOTA_RESET_AT;
+
+  if (limit === undefined || used === undefined || resetsAt === undefined) return undefined;
+
+  return {
+    limitUnits: Number(limit),
+    usedUnits: Number(used),
+    resetsAt,
   };
 }
 
@@ -45,8 +69,15 @@ export async function generateWorkflowResults(project: Project): Promise<Workflo
     sourceText: project.sourceText,
   });
   const config = runtimeModelConfig(project);
+  const costDecision = evaluateCostPolicy({
+    mode: resolveCostMode(process.env.COST_MODE),
+    request: { capability: "ai_text", inputCharacters: project.sourceText.length },
+    billingOwner: providerBillingOwner(process.env.AI_PROVIDER_OWNERSHIP),
+    providerConnected: Boolean(config.apiKey),
+    quota: providerQuotaFromEnvironment(),
+  });
 
-  if (!config.apiKey) {
+  if (!config.apiKey || !costDecision.allowed) {
     return fallback;
   }
 

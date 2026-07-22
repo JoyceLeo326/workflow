@@ -16,5 +16,9 @@ describe("buildFallbackWorkflowResult", () => {
     expect(result.shots).toHaveLength(6);
     expect(result.timeline.totalDurationSeconds).toBeGreaterThan(0);
     expect(result.directorNotes.qualityChecks).toContain("已生成剧本结构、角色、场景、分镜和成片预演。");
+    expect(result.directorNotes.qualityChecks).toContain("本地规则演示，不是 AI 生成。");
+    expect(result.directorNotes.nextSteps).toContain(
+      "连接用户或机构自有 Provider 后再生成图片、配音或视频",
+    );
   });
 });
