@@ -12,9 +12,21 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const title = "创剧AI - 小说改剧工作流";
+const description =
+  "将小说改编为剧本、角色、场景、分镜和成片预演的 AI 工作流，无需 API Key 即可体验完整浏览器演示。";
+
 export const metadata: Metadata = {
-  title: "创剧AI - 小说改剧工作流",
-  description: "将小说改编为剧本、角色、场景、分镜和成片预演的本地 AI 工作流 MVP",
+  applicationName: "创剧AI",
+  title,
+  description,
+  openGraph: {
+    type: "website",
+    locale: "zh_CN",
+    siteName: "创剧AI",
+    title,
+    description,
+  },
 };
 
 export default function RootLayout({
