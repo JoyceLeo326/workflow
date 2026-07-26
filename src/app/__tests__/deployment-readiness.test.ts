@@ -11,18 +11,16 @@ afterEach(() => {
 });
 
 describe("public deployment readiness", () => {
-  it("keeps the complete demo usable without an API key or provider request", async () => {
+  it("refuses to report AI output without an API key or provider request", async () => {
     const previousApiKey = process.env.OPENAI_API_KEY;
     delete process.env.OPENAI_API_KEY;
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
 
     try {
-      const result = await generateWorkflowResults(makeProjectFixture());
-
-      expect(result.scriptStructure.acts).toHaveLength(3);
-      expect(result.shots).toHaveLength(6);
-      expect(result.timeline.items).toHaveLength(6);
+      await expect(generateWorkflowResults(makeProjectFixture())).rejects.toThrow(
+        "AI_PROVIDER_UNAVAILABLE",
+      );
       expect(fetchMock).not.toHaveBeenCalled();
     } finally {
       if (previousApiKey === undefined) {
@@ -127,11 +125,13 @@ describe("public deployment readiness", () => {
     }
   });
 
-  it("publishes portfolio metadata for the no-key browser experience", () => {
+  it("publishes product metadata without implementation commentary", () => {
     const layout = readFileSync(join(projectRoot, "src/app/layout.tsx"), "utf8");
 
     expect(layout).toContain('applicationName: "创剧AI"');
     expect(layout).toContain("openGraph:");
-    expect(layout).toContain("无需 API Key");
+    expect(layout).toContain("前期制片");
+    expect(layout).not.toContain("无需 API Key");
+    expect(layout).not.toContain("本地规则");
   });
 });

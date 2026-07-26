@@ -1,3 +1,5 @@
+import type { ProductionDocument, ProductionVersion } from "@/lib/production/types";
+
 export type ProjectStatus = "draft" | "running" | "completed" | "failed";
 export type AgentStepStatus = "waiting" | "running" | "completed" | "failed";
 
@@ -118,6 +120,8 @@ export type Project = {
   modelConfig: ModelConfig;
   steps: AgentStep[];
   results?: WorkflowResults;
+  production?: ProductionDocument;
+  productionHistory?: ProductionVersion[];
   error?: string;
   createdAt: string;
   updatedAt: string;

@@ -33,9 +33,9 @@ describe("generateWorkflowResults cost guard", () => {
     const fetchMock = vi.fn().mockRejectedValue(new Error("must not call provider"));
     vi.stubGlobal("fetch", fetchMock);
 
-    const result = await generateWorkflowResults(makeProjectFixture());
-
+    await expect(generateWorkflowResults(makeProjectFixture())).rejects.toThrow(
+      "AI_PROVIDER_UNAVAILABLE",
+    );
     expect(fetchMock).not.toHaveBeenCalled();
-    expect(result.directorNotes.qualityChecks).toContain("本地规则演示，不是 AI 生成。");
   });
 });

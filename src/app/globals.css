@@ -18,12 +18,14 @@
 
 html {
   background: var(--background);
+  scroll-behavior: smooth;
 }
 
 body {
   min-width: 320px;
   background: var(--background);
   color: var(--foreground);
+  text-rendering: optimizeLegibility;
 }
 
 button,
@@ -31,4 +33,21 @@ input,
 textarea,
 select {
   font: inherit;
+}
+
+button,
+a,
+input,
+textarea,
+select {
+  outline-offset: 3px;
+}
+
+:focus-visible {
+  outline: 2px solid #7c3aed;
+}
+
+::selection {
+  background: #ddd6fe;
+  color: #2e1065;
 }
