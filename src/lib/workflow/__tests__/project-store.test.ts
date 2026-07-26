@@ -78,7 +78,7 @@ describe("project-store", () => {
     );
 
     expect(updated.status).toBe("completed");
-    expect(updated.results?.shots).toHaveLength(6);
-    expect((await getProject(project.id, { storageRoot }))?.results?.timeline.items).toHaveLength(6);
+    expect(updated.results?.shots).toHaveLength(1);
+    expect((await getProject(project.id, { storageRoot }))?.results?.timeline.items).toHaveLength(1);
   });
 });

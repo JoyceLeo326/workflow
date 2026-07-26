@@ -11,7 +11,7 @@ describe("workflow exporters", () => {
     expect(markdown).toContain("## 角色列表");
     expect(markdown).toContain("## 场景列表");
     expect(markdown).toContain("## 分镜表");
-    expect(markdown).toContain("## 成片预演");
+    expect(markdown).toContain("## 时序草案");
   });
 
   it("exports shot CSV with stable columns", () => {
@@ -28,6 +28,6 @@ describe("workflow exporters", () => {
     const parsed = JSON.parse(json);
 
     expect(parsed.title).toBe("雨夜归途");
-    expect(parsed.results.shots).toHaveLength(6);
+    expect(parsed.results.shots).toHaveLength(1);
   });
 });

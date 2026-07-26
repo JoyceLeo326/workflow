@@ -1,6 +1,5 @@
 import { createInitialSteps } from "./agents";
 import { requestJsonWithRetry } from "./ai-json";
-import { buildFallbackWorkflowResult } from "./fallback";
 import { callOpenAiCompatibleJson } from "./model-client";
 import { buildWorkflowMessages } from "./prompts";
 import { workflowResultsSchema } from "./schemas";
@@ -42,32 +41,19 @@ function providerQuotaFromEnvironment(): QuotaWindow | undefined {
   };
 }
 
-function markStep(steps: AgentStep[], index: number, status: AgentStep["status"]): AgentStep[] {
+function markAllSteps(steps: AgentStep[], status: AgentStep["status"], error?: string): AgentStep[] {
   const now = new Date().toISOString();
-  return steps.map((step, stepIndex) => {
-    if (stepIndex !== index) {
-      return step;
-    }
-
-    return {
+  return steps.map((step) => ({
       ...step,
       status,
       progress: status === "completed" ? 100 : 50,
       startedAt: status === "running" ? now : step.startedAt,
       completedAt: status === "completed" ? now : step.completedAt,
-    };
-  });
-}
-
-async function pause(ms: number) {
-  await new Promise((resolve) => setTimeout(resolve, ms));
+      error,
+    }));
 }
 
 export async function generateWorkflowResults(project: Project): Promise<WorkflowResults> {
-  const fallback = buildFallbackWorkflowResult({
-    title: project.title,
-    sourceText: project.sourceText,
-  });
   const config = runtimeModelConfig(project);
   const costDecision = evaluateCostPolicy({
     mode: resolveCostMode(process.env.COST_MODE),
@@ -78,7 +64,7 @@ export async function generateWorkflowResults(project: Project): Promise<Workflo
   });
 
   if (!config.apiKey || !costDecision.allowed) {
-    return fallback;
+    throw new Error("AI_PROVIDER_UNAVAILABLE：请先连接可用的用户或机构生成服务。");
   }
 
   const apiKey = config.apiKey;
@@ -91,11 +77,17 @@ export async function generateWorkflowResults(project: Project): Promise<Workflo
         model: config.model,
         messages: buildWorkflowMessages(project),
       }),
-    fallback,
+    {} as WorkflowResults,
   );
+  if (result.usedFallback) {
+    throw new Error(`AI_PROVIDER_INVALID_RESPONSE：${result.error ?? "模型未返回有效 JSON"}`);
+  }
 
   const parsed = workflowResultsSchema.safeParse(result.value);
-  return parsed.success ? parsed.data : fallback;
+  if (!parsed.success) {
+    throw new Error("AI_PROVIDER_SCHEMA_MISMATCH：模型输出未通过结构校验。");
+  }
+  return parsed.data;
 }
 
 export async function* runProjectWorkflow(projectId: string): AsyncGenerator<RunEvent> {
@@ -112,34 +104,29 @@ export async function* runProjectWorkflow(projectId: string): AsyncGenerator<Run
   });
 
   try {
-    for (let index = 0; index < project.steps.length; index += 1) {
-      const runningSteps = markStep(project.steps, index, "running");
-      project = await updateProject(projectId, { steps: runningSteps, status: "running" });
-      yield { type: "step", step: project.steps[index], project };
-
-      if (index === project.steps.length - 1) {
-        const results = await generateWorkflowResults(project);
-        const completedSteps = markStep(project.steps, index, "completed");
-        project = await updateProject(projectId, {
-          status: "completed",
-          steps: completedSteps,
-          results,
-        });
-      } else {
-        await pause(120);
-        const completedSteps = markStep(project.steps, index, "completed");
-        project = await updateProject(projectId, { steps: completedSteps });
-      }
-
-      yield { type: "step", step: project.steps[index], project };
+    const runningSteps = markAllSteps(project.steps, "running");
+    project = await updateProject(projectId, { steps: runningSteps, status: "running" });
+    for (const step of project.steps) {
+      yield { type: "step", step, project };
     }
 
+    const results = await generateWorkflowResults(project);
+    const completedSteps = markAllSteps(project.steps, "completed");
+    project = await updateProject(projectId, {
+      status: "completed",
+      steps: completedSteps,
+      results,
+    });
+    for (const step of project.steps) {
+      yield { type: "step", step, project };
+    }
     yield { type: "complete", project };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     project = await updateProject(projectId, {
       status: "failed",
       error: message,
+      steps: markAllSteps(project.steps, "failed", message),
     });
     yield { type: "error", error: message, project };
   }

@@ -96,7 +96,7 @@ export function exportProjectAsMarkdown(project: Project): string {
     "| --- | --- | --- | --- | --- | --- |",
     shots,
     "",
-    "## 成片预演",
+    "## 时序草案",
     "",
     `总时长：${results.timeline.totalDurationSeconds} 秒`,
     "",

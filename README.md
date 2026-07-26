@@ -1,20 +1,23 @@
-# 创剧AI：小说改剧工作流 MVP
+# 创剧AI：小说改剧工作台
 
-一个默认零项目方成本的开源 MVP，用确定性本地规则把小说文本整理为短剧生产资料：剧本结构、角色卡、场景卡、分镜表、首尾帧提示词和成片预演时间线。
+面向小说改编与短剧前期制片的开源工作台。导入原著后，可以整理叙事节点、编辑 Story Bible、规划分集与场景、保存版本并生成完整交付包。
+
+[在线使用](https://chuangju-ai.vercel.app/)
 
 ## 功能
 
-- 小说输入：支持粘贴文本，上传 `.txt` / `.docx`
-- Agent 管线：小说分析师、剧本改编师、角色提取师、场景提取师、分镜师、首尾帧生成师、总导演
-- 结果视图：剧本结构、角色列表、场景列表、分镜大纲、成片预演
-- 本地持久化：项目保存到 `data/projects`
-- 导出：Markdown、JSON、CSV
-- 模型接入：仅允许用户或机构自有且有权威配额的 DeepSeek / OpenAI-compatible Provider
-- 无 Key 演示：默认使用确定性本地 fallback；这是本地规则演示，不是 AI 生成
-- 公网演示模式：服务端 API 或临时存储不可用时，前端会自动生成浏览器本地演示结果
-- 媒体能力边界：图片、TTS、视频必须连接用户或机构 Provider；当前版本不伪造生成成功
-- 成本边界：`zero_owner_cost` 默认开启，无自动扣费，项目方 Key 不会被使用
-- 合规复刻矩阵：展示公开开源灵感来源、许可证、差异化重写点和不复制策略
+- 小说输入：支持粘贴文本，浏览器端上传 `.txt` / `.md` / `.docx`
+- 结构整理：按原文顺序拆分叙事节点，保留故事来源
+- 生成服务：连接 HTTPS OpenAI-compatible 服务，Key 只保留在当前页面会话
+- AI 制作：支持自定义模型、5–300 秒超时、主动取消和 Zod Schema 校验
+- 创作编辑器：Story Bible、人物、地点、分集与场景均可编辑
+- 版本历史：浏览器本地保存命名版本并恢复，恢复操作本身也生成新版本
+- 结果视图：剧本结构、人物卡、场景卡、镜头表和时序草案
+- 本地持久化：公开工作台项目保存在浏览器；服务端模式保存到 `data/projects`
+- 正式导出：Fountain、DOCX、PDF、SRT 和包含原著/当前数据/全部交付文件的项目 ZIP
+- 结构导出：Markdown、JSON、CSV
+- 模型接入：支持自定义接口地址、模型、超时与主动取消
+- 数据校验：生成结果通过 Schema 校验后才进入编辑器
 
 ## 技术栈
 
@@ -34,22 +37,15 @@ npm run dev
 
 打开 `http://localhost:3000`。
 
-默认配置不需要 Key。外部 Provider 仅适用于用户或机构自有账号，并且必须提供未过期的权威配额快照；详细边界见 [`docs/zero-owner-cost.md`](docs/zero-owner-cost.md)。
-
-服务端配置入口如下，禁止提交真实值：
+如需在服务端接入生成服务，可配置：
 
 ```bash
-COST_MODE=zero_owner_cost
-AI_PROVIDER_OWNERSHIP=user
-AI_PROVIDER_QUOTA_LIMIT=your_limit
-AI_PROVIDER_QUOTA_USED=your_usage
-AI_PROVIDER_QUOTA_RESET_AT=your_iso_reset_time
 OPENAI_API_KEY=your_server_only_api_key
 OPENAI_BASE_URL=https://api.deepseek.com/v1
 OPENAI_MODEL=deepseek-chat
 ```
 
-部署到无持久文件系统的平台时仍可体验核心流程：点击“开始改剧”后，如果服务端项目存储不可用，页面会自动切换到浏览器本地规则演示，不需要 API Key 或付费服务，也不会生成真实图片、音频或视频。
+不连接生成服务时，仍可完成原著导入、结构整理、本地保存、手动编辑和导出。
 
 ## 测试与构建
 
@@ -68,20 +64,11 @@ npm run build
 - `GET /api/projects/:id/export?format=md|json|csv`：导出项目结果
 - `POST /api/files/text`：解析 `.txt` / `.docx`
 
-## 作品集展示点
-
-- 将多 Agent 文本生产流程产品化为可操作工作台
-- 使用流式接口展示任务进度
-- 支持 AI 接口失败、未配置或成本策略拒绝时的本地规则 fallback
-- 用结构化类型和测试约束剧本、角色、场景、分镜、时间线输出
-- 为后续接入图片生成、配音和剪辑工具保留清晰数据结构
-- 保留可审计的开源灵感来源记录，证明只参考公开产品模式，不复制第三方源码、素材或品牌
-
 ## 合规与真实性
 
 本项目参考了 `langchain-ai/langgraph`、`run-llama/llama_index`、`cline/cline` 的公开产品模式，但代码、UI、数据结构、中文文案和演示流程均为本仓库原创实现。
 
-详细记录见 [`docs/compliance-open-source-replication.md`](docs/compliance-open-source-replication.md) 与 [`docs/zero-owner-cost.md`](docs/zero-owner-cost.md)。
+详细记录见 [`docs/compliance-open-source-replication.md`](docs/compliance-open-source-replication.md)。
 
 ## 开源协议
 
