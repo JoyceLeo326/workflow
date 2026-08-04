@@ -41,23 +41,33 @@ const previous = new Map(domGlobals.map((key) => [key, globalThis[key]]));
 let dom;
 
 try {
-  const [htmlResponse, appResponse, experienceResponse] = await Promise.all([
+  const [htmlResponse, stylesResponse, appResponse, experienceResponse] = await Promise.all([
     fetch(`${baseUrl}/index.html`),
+    fetch(`${baseUrl}/styles.css`),
     fetch(`${baseUrl}/app.js`),
     fetch(`${baseUrl}/experience.js`),
   ]);
 
   assert.equal(htmlResponse.status, 200);
   assert.match(htmlResponse.headers.get("content-type") ?? "", /^text\/html/);
+  assert.match(stylesResponse.headers.get("content-type") ?? "", /^text\/css/);
   assert.match(appResponse.headers.get("content-type") ?? "", /^text\/javascript/);
   assert.match(experienceResponse.headers.get("content-type") ?? "", /^text\/javascript/);
 
-  const [html, appSource, experienceSource] = await Promise.all([
+  const [html, styles, appSource, experienceSource] = await Promise.all([
     htmlResponse.text(),
+    stylesResponse.text(),
     appResponse.text(),
     experienceResponse.text(),
   ]);
   dom = new JSDOM(html, { url: `${baseUrl}/index.html`, pretendToBeVisual: true });
+  Object.defineProperties(dom.window, {
+    innerWidth: { configurable: true, value: 390 },
+    innerHeight: { configurable: true, value: 844 },
+  });
+  const style = dom.window.document.createElement("style");
+  style.textContent = styles;
+  dom.window.document.head.append(style);
   dom.window.HTMLElement.prototype.scrollIntoView = () => {};
   dom.window.URL.createObjectURL = () => "blob:mirror-smoke";
   dom.window.URL.revokeObjectURL = () => {};
@@ -98,7 +108,24 @@ try {
   assert.equal(document.querySelector("#revision-result").classList.contains("is-hidden"), false);
   assert.match(document.querySelector("#revision-action").textContent, /钩子|开场|问题/);
 
-  console.log("HTTP mirror smoke passed: JS MIME, module execution, candidate generation, confirmation and review backflow.");
+  const scoreLabel = document.querySelector(".score-row label");
+  const scoreInput = scoreLabel.querySelector("input");
+  assert.equal(window.getComputedStyle(scoreLabel).position, "relative");
+  assert.equal(window.getComputedStyle(scoreInput).position, "absolute");
+  assert.equal(window.getComputedStyle(scoreInput).width, "1px");
+  assert.equal(window.getComputedStyle(scoreInput).height, "1px");
+  assert.equal(window.getComputedStyle(scoreInput).clipPath, "inset(50%)");
+
+  for (const selector of [".brand", ".site-header nav a", ".text-button", "footer a"]) {
+    const target = document.querySelector(selector);
+    assert(target, `Expected ${selector} in the public mirror.`);
+    assert.equal(window.getComputedStyle(target).minHeight, "44px", `${selector} must expose a 44px touch target.`);
+  }
+
+  const horizontalOverflow = Math.max(0, document.documentElement.scrollWidth - window.innerWidth);
+  assert.equal(horizontalOverflow, 0, "The 390x844 experience must not overflow horizontally.");
+
+  console.log("HTTP mirror smoke passed: MIME, module pipeline, review backflow, 390x844 overflow=0 and 44px touch targets.");
 } finally {
   dom?.window.close();
   for (const [key, value] of previous) {

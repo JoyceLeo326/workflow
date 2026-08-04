@@ -15,5 +15,10 @@ describe("public static mirror contract", () => {
     expect(html).toContain('src="./app.js"');
     expect(`${html}\n${css}\n${app}`).not.toMatch(/https?:\/\//);
     expect(JSON.parse(packageJson).scripts["build:public-mirror"]).toBeTruthy();
+    expect(css).toMatch(/\.score-row label\s*\{[^}]*position:\s*relative[^}]*min-width:\s*0/s);
+    expect(css).toMatch(/\.score-row input\s*\{[^}]*width:\s*1px[^}]*height:\s*1px[^}]*clip-path:\s*inset\(50%\)/s);
+    for (const selector of [".brand", ".site-header nav a", ".text-button", "footer a"]) {
+      expect(css).toContain(`${selector} { min-height: 44px;`);
+    }
   });
 });
