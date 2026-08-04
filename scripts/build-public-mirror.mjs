@@ -6,7 +6,7 @@ const root = process.cwd();
 const sourceDir = resolve(root, "mirror-src");
 const outputDir = resolve(root, "public-mirror");
 const publicPath = "/liujiarui-product-lab/mirrors/creative-ai/";
-const files = ["index.html", "styles.css", "app.mjs", "experience.mjs"];
+const files = ["index.html", "styles.css", "app.js", "experience.js"];
 
 if (dirname(outputDir) !== root || basename(outputDir) !== "public-mirror") {
   throw new Error("Refusing to replace an unexpected public mirror directory.");

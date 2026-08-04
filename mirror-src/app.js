@@ -4,7 +4,7 @@ import {
   createRevision,
   generateCandidates,
   normalizeMission,
-} from "./experience.mjs";
+} from "./experience.js";
 
 const STORAGE_KEY = "creative-ai-mirror-state-v1";
 const byId = (id) => document.getElementById(id);

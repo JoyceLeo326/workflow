@@ -64,6 +64,7 @@ npm run security:secrets
 
 ```bash
 npm run build:public-mirror
+npm run test:public-mirror
 npm run security:mirror
 ```
 

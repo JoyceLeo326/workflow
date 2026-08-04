@@ -6,7 +6,7 @@ import {
   createRevision,
   generateCandidates,
   normalizeMission,
-} from "./experience.mjs";
+} from "./experience.js";
 
 const source =
   "林默在停电的剧院后台找到一封没有署名的信。她以为父亲已经离开，却听见舞台上传来旧录音。灯光恢复时，信上的日期正是十年后的今天。";
