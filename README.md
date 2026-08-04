@@ -2,7 +2,7 @@
 
 面向小说改编与短剧前期制片的开源工作台。导入原著后，可以整理叙事节点、编辑 Story Bible、规划分集与场景、保存版本并生成完整交付包。
 
-[在线使用](https://chuangju-ai.vercel.app/)
+[公开体验镜像](https://joyceleo326.github.io/liujiarui-product-lab/mirrors/creative-ai/)
 
 ## 功能
 
@@ -57,6 +57,17 @@ npm run lint
 npm run build
 npm run security:secrets
 ```
+
+## 公开静态兼容模式
+
+`mirror-src/` 是一套不依赖服务端和外部运行时资源的完整创作链路：填写个人任务与原文后，可以比较三条带明确取舍和原文锚点的路线、确认分段交付稿、下载真实 Markdown/JSON，并将本机反馈写回下一版修订动作。
+
+```bash
+npm run build:public-mirror
+npm run security:mirror
+```
+
+可发布产物位于 `public-mirror/`；入口、样式、脚本和图标全部使用相对路径，`mirror-manifest.json` 记录能力边界及每个运行时文件的 SHA-256。该产物不包含环境文件、服务端路由、模型凭据或用户数据。
 
 ## API
 
