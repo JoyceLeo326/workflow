@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { createProject, listProjects } from "@/lib/storage/project-store";
+import { normalizeCreativeBrief } from "@/lib/workflow/brief";
+import type { CreativeBrief } from "@/lib/workflow/types";
 
 export const runtime = "nodejs";
 
@@ -12,6 +14,7 @@ export async function POST(request: Request) {
     title?: string;
     sourceText?: string;
     modelConfig?: { baseUrl?: string; model?: string };
+    creativeBrief?: Partial<CreativeBrief>;
   };
 
   if (!body.sourceText?.trim()) {
@@ -22,6 +25,7 @@ export async function POST(request: Request) {
     title: body.title?.trim() || "未命名项目",
     sourceText: body.sourceText,
     modelConfig: body.modelConfig,
+    creativeBrief: normalizeCreativeBrief(body.creativeBrief),
   });
 
   return NextResponse.json({ project }, { status: 201 });

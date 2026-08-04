@@ -1,6 +1,8 @@
 import type { Project } from "./types";
+import { normalizeCreativeBrief } from "./brief";
 
 export function buildWorkflowMessages(project: Project) {
+  const creativeBrief = normalizeCreativeBrief(project.creativeBrief);
   const contract = {
     scriptStructure: {
       title: "string",
@@ -80,6 +82,8 @@ export function buildWorkflowMessages(project: Project) {
       role: "user" as const,
       content: [
         `项目标题：${project.title}`,
+        `本轮创作约束：${JSON.stringify(creativeBrief)}`,
+        "目标观众、本轮优先与单集时长必须实际影响候选结构、场景密度和镜头节奏；所有取舍仍须可回溯原文。",
         "请完成一次结构化前期制片分析，输出剧情结构、人物候选、场景候选、镜头草案和时序草案。",
         "输出必须完全匹配以下 JSON 结构，至少 3 个角色、3 个场景、6 个镜头：",
         JSON.stringify(contract, null, 2),

@@ -894,6 +894,8 @@ export function ProductionWorkspace({
           projectTitle: project.title,
           sourceText: project.sourceText,
           production,
+          creativeBrief: project.creativeBrief,
+          adaptationDecision: project.results?.adaptationDecision,
           docxBytes: new Uint8Array(await docx.arrayBuffer()),
           pdfBytes: new Uint8Array(await pdf.arrayBuffer()),
         });

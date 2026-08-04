@@ -31,9 +31,16 @@ import {
   exportProjectAsMarkdown,
 } from "@/lib/workflow/exporters";
 import { buildFallbackWorkflowResult } from "@/lib/workflow/fallback";
+import {
+  DEFAULT_CREATIVE_BRIEF,
+  normalizeCreativeBrief,
+  priorityChoices,
+} from "@/lib/workflow/brief";
 import type {
   AgentStep,
   CharacterCard,
+  CreativeBrief,
+  EpisodeMinutes,
   Project,
   SceneCard,
   ShotCard,
@@ -100,7 +107,11 @@ function persistLocalProjects(projects: Project[]) {
   }
 }
 
-function createLocalDraftProject(title: string, sourceText: string): Project {
+function createLocalDraftProject(
+  title: string,
+  sourceText: string,
+  creativeBrief: CreativeBrief,
+): Project {
   const now = new Date().toISOString();
   return {
     id: `${LOCAL_PROJECT_PREFIX}${globalThis.crypto?.randomUUID?.() ?? Date.now()}`,
@@ -108,10 +119,12 @@ function createLocalDraftProject(title: string, sourceText: string): Project {
     sourceText: sourceText.trim(),
     status: "completed",
     modelConfig: { model: "local-structure" },
+    creativeBrief,
     steps: createInitialSteps(),
     results: buildFallbackWorkflowResult({
       title: title.trim() || "未命名项目",
       sourceText,
+      creativeBrief,
     }),
     createdAt: now,
     updatedAt: now,
@@ -147,7 +160,19 @@ function exportLocalProject(project: Project, format: ExportFormat) {
   downloadTextFile(`${baseName}.md`, "text/markdown", exportProjectAsMarkdown(project));
 }
 
-function AccountDialog({ mode, onClose }: { mode: AccountMode; onClose: () => void }) {
+function AccountDialog({
+  mode,
+  creatorName,
+  onClose,
+  onSave,
+}: {
+  mode: AccountMode;
+  creatorName: string;
+  onClose: () => void;
+  onSave: (creatorName: string) => void;
+}) {
+  const [name, setName] = useState(creatorName);
+
   useEffect(() => {
     if (!mode) return;
     const closeOnEscape = (event: KeyboardEvent) => {
@@ -189,15 +214,33 @@ function AccountDialog({ mode, onClose }: { mode: AccountMode; onClose: () => vo
           {title}
         </h2>
         <p className="mt-2 text-sm leading-6 text-slate-600">
-          账号与团队协作服务尚未开放。当前项目仍可在本设备创建、保存与导出。
+          设置主创称呼，之后创建的任务、版本与导出文件会沿用这份署名。
         </p>
-        <button
-          className="mt-6 h-11 w-full rounded-xl bg-slate-950 text-sm font-semibold text-white"
-          type="button"
-          onClick={onClose}
+        <form
+          className="mt-5"
+          onSubmit={(event) => {
+            event.preventDefault();
+            onSave(name);
+          }}
         >
-          返回工作台
-        </button>
+          <label className="block text-xs font-medium text-slate-600" htmlFor="account-creator-name">
+            主创称呼
+          </label>
+          <input
+            id="account-creator-name"
+            autoComplete="name"
+            className="mt-2 h-11 w-full rounded-xl border border-slate-200 px-3 text-sm focus:border-violet-400"
+            maxLength={24}
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+          />
+          <button
+            className="mt-4 h-11 w-full rounded-xl bg-slate-950 text-sm font-semibold text-white hover:bg-violet-700"
+            type="submit"
+          >
+            {mode === "login" ? "进入创作空间" : "创建创作空间"}
+          </button>
+        </form>
       </section>
     </div>
   );
@@ -237,6 +280,45 @@ function StructureView({ project }: { project: Project | null }) {
 
   return (
     <div className="space-y-4">
+      {project.results?.adaptationDecision ? (
+        <section className="overflow-hidden rounded-2xl border border-violet-200 bg-[#17131f] text-white">
+          <div className="grid gap-px bg-white/10 lg:grid-cols-[0.8fr_1.2fr_1.2fr]">
+            <div className="bg-[#17131f] p-5">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-violet-300">
+                本轮任务
+              </div>
+              <h3 className="mt-3 text-lg font-semibold">{project.results.adaptationDecision.owner}</h3>
+              <p className="mt-2 text-xs text-white/55">交付节点 · {project.results.adaptationDecision.deliveryTime}</p>
+            </div>
+            <div className="bg-[#17131f] p-5">
+              <div className="text-[11px] font-semibold text-amber-300">容量冲突</div>
+              <p className="mt-2 text-xs leading-6 text-white/70">
+                {project.results.adaptationDecision.conflict}
+              </p>
+              <div className="mt-4 text-[11px] font-semibold text-violet-300">本轮取舍</div>
+              <p className="mt-2 text-xs leading-6 text-white/70">
+                {project.results.adaptationDecision.choice}
+              </p>
+            </div>
+            <div className="bg-[#17131f] p-5">
+              <div className="text-[11px] font-semibold text-emerald-300">观众影响与回看</div>
+              <p className="mt-2 text-xs leading-6 text-white/70">
+                {project.results.adaptationDecision.audienceEffect}
+              </p>
+              <p className="mt-3 border-t border-white/10 pt-3 text-xs leading-6 text-white/70">
+                {project.results.adaptationDecision.reviewPrompt}
+              </p>
+              <a
+                className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-xl bg-white px-4 text-xs font-semibold text-slate-950 hover:bg-violet-50"
+                href="#production"
+              >
+                确认取舍，继续分集
+                <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
+              </a>
+            </div>
+          </div>
+        </section>
+      ) : null}
       <section className="rounded-2xl border border-slate-200 bg-white p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -476,6 +558,7 @@ export function Workbench() {
   const [isUploading, setIsUploading] = useState(false);
   const [message, setMessage] = useState("导入原著，开始整理");
   const [accountMode, setAccountMode] = useState<AccountMode>(null);
+  const [creativeBrief, setCreativeBrief] = useState<CreativeBrief>({ ...DEFAULT_CREATIVE_BRIEF });
 
   const results = project?.results;
   const canRun = sourceText.trim().length > 0 && !isRunning;
@@ -496,6 +579,7 @@ export function Workbench() {
         setTitle(latest.title);
         setSourceText(latest.sourceText);
         setSteps(latest.steps);
+        setCreativeBrief(normalizeCreativeBrief(latest.creativeBrief));
         setMessage(`已恢复 ${latest.title}`);
       }
     });
@@ -544,6 +628,13 @@ export function Workbench() {
     setMessage("示例已载入");
   }
 
+  function updateCreativeBrief<K extends keyof CreativeBrief>(key: K, value: CreativeBrief[K]) {
+    setCreativeBrief((current) => ({ ...current, [key]: value }));
+    setProject(null);
+    setSteps(createInitialSteps());
+    setMessage("改编任务已更新，请重新整理草案");
+  }
+
   async function handleFile(file: File) {
     if (file.size > MAX_SOURCE_FILE_BYTES) {
       setMessage("文件超过 10MB，请拆分后再导入");
@@ -586,7 +677,7 @@ export function Workbench() {
   function createStructureDraft() {
     if (!canRun) return;
     setIsRunning(true);
-    const localProject = createLocalDraftProject(title, sourceText);
+    const localProject = createLocalDraftProject(title, sourceText, creativeBrief);
     mergeProject(localProject);
     setSteps(localProject.steps);
     setActiveTab("structure");
@@ -608,13 +699,24 @@ export function Workbench() {
     setTitle(item.title);
     setSourceText(item.sourceText);
     setSteps(item.steps);
+    setCreativeBrief(normalizeCreativeBrief(item.creativeBrief));
     setActiveTab("structure");
     setMessage(`已打开 ${item.title}`);
   }
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#f4f1ec] text-slate-900">
-      <AccountDialog mode={accountMode} onClose={() => setAccountMode(null)} />
+      <AccountDialog
+        key={`${accountMode ?? "closed"}-${creativeBrief.creatorName}`}
+        mode={accountMode}
+        creatorName={creativeBrief.creatorName}
+        onClose={() => setAccountMode(null)}
+        onSave={(creatorName) => {
+          updateCreativeBrief("creatorName", creatorName.trim() || DEFAULT_CREATIVE_BRIEF.creatorName);
+          setAccountMode(null);
+          setMessage(`主创已更新为 ${creatorName.trim() || DEFAULT_CREATIVE_BRIEF.creatorName}`);
+        }}
+      />
 
       <header className="sticky top-0 z-40 border-b border-white/10 bg-[#121116]/95 text-white backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-[1600px] items-center gap-5 px-4 sm:px-6">
@@ -726,6 +828,24 @@ export function Workbench() {
           </div>
 
           <div className="space-y-4 p-5">
+            <section className="rounded-2xl bg-slate-950 p-4 text-white" aria-labelledby="creative-brief-title">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h3 id="creative-brief-title" className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-300">
+                  改编任务
+                </h3>
+                <span className="rounded-full bg-white/10 px-2.5 py-1 text-[11px] text-white/65">
+                  {creativeBrief.deliveryTime} 交付
+                </span>
+              </div>
+              <p className="mt-3 text-sm font-medium">
+                {creativeBrief.creatorName}要把原著压进 {creativeBrief.episodeMinutes} 分钟
+              </p>
+              <p className="mt-2 text-xs leading-6 text-white/55">
+                面向{creativeBrief.targetAudience}观众，本轮选择“{creativeBrief.priority}”：
+                {priorityChoices[creativeBrief.priority]}
+              </p>
+            </section>
+
             <label className="block">
               <span className="mb-2 block text-xs font-medium text-slate-600">项目名称</span>
               <input
@@ -736,6 +856,82 @@ export function Workbench() {
                 onChange={(event) => setTitle(event.target.value)}
               />
             </label>
+
+            <fieldset className="grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:grid-cols-2">
+              <legend className="px-1 text-xs font-semibold text-slate-700">谁在何时做什么取舍</legend>
+              <label className="block text-xs font-medium text-slate-600">
+                主创称呼
+                <input
+                  aria-label="主创称呼"
+                  className="mt-2 h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm focus:border-violet-400"
+                  maxLength={24}
+                  value={creativeBrief.creatorName}
+                  onChange={(event) => updateCreativeBrief("creatorName", event.target.value)}
+                />
+              </label>
+              <label className="block text-xs font-medium text-slate-600">
+                我的角色
+                <select
+                  aria-label="我的角色"
+                  className="mt-2 h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm focus:border-violet-400"
+                  value={creativeBrief.creatorRole}
+                  onChange={(event) => updateCreativeBrief("creatorRole", event.target.value as CreativeBrief["creatorRole"])}
+                >
+                  <option>编剧</option>
+                  <option>制片统筹</option>
+                  <option>IP责编</option>
+                </select>
+              </label>
+              <label className="block text-xs font-medium text-slate-600">
+                目标观众
+                <select
+                  aria-label="目标观众"
+                  className="mt-2 h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm focus:border-violet-400"
+                  value={creativeBrief.targetAudience}
+                  onChange={(event) => updateCreativeBrief("targetAudience", event.target.value as CreativeBrief["targetAudience"])}
+                >
+                  <option>悬疑追更</option>
+                  <option>情感共鸣</option>
+                  <option>轻喜反转</option>
+                </select>
+              </label>
+              <label className="block text-xs font-medium text-slate-600">
+                本轮优先
+                <select
+                  aria-label="本轮优先"
+                  className="mt-2 h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm focus:border-violet-400"
+                  value={creativeBrief.priority}
+                  onChange={(event) => updateCreativeBrief("priority", event.target.value as CreativeBrief["priority"])}
+                >
+                  <option>人物情感</option>
+                  <option>悬念节奏</option>
+                  <option>低成本拍摄</option>
+                </select>
+              </label>
+              <label className="block text-xs font-medium text-slate-600">
+                单集时长
+                <select
+                  aria-label="单集时长"
+                  className="mt-2 h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm focus:border-violet-400"
+                  value={creativeBrief.episodeMinutes}
+                  onChange={(event) => updateCreativeBrief("episodeMinutes", Number(event.target.value) as EpisodeMinutes)}
+                >
+                  <option value="1">1 分钟</option>
+                  <option value="3">3 分钟</option>
+                  <option value="5">5 分钟</option>
+                </select>
+              </label>
+              <label className="block text-xs font-medium text-slate-600">
+                交付时间
+                <input
+                  aria-label="交付时间"
+                  className="mt-2 h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm focus:border-violet-400"
+                  maxLength={32}
+                  value={creativeBrief.deliveryTime}
+                  onChange={(event) => updateCreativeBrief("deliveryTime", event.target.value)}
+                />
+              </label>
+            </fieldset>
 
             <label
               className="group flex min-h-28 cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-center transition hover:border-violet-400 hover:bg-violet-50/50"

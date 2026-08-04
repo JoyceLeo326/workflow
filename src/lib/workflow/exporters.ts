@@ -8,8 +8,12 @@ function csvEscape(value: string | number): string {
   return text;
 }
 
-function shotToCsvRow(shot: ShotCard): string {
+function shotToCsvRow(project: Project, shot: ShotCard): string {
+  const brief = project.creativeBrief;
   return [
+    brief?.targetAudience ?? "未设置",
+    brief?.priority ?? "未设置",
+    brief?.episodeMinutes ?? "",
     shot.shotNumber,
     shot.scene,
     shot.visual,
@@ -26,8 +30,8 @@ function shotToCsvRow(shot: ShotCard): string {
 }
 
 export function exportProjectAsCsv(project: Project): string {
-  const header = "镜号,场景,画面,景别,运镜,旁白,字幕,时长秒,首帧提示词,尾帧提示词";
-  const rows = project.results?.shots.map(shotToCsvRow) ?? [];
+  const header = "目标观众,本轮优先,单集分钟,镜号,场景,画面,景别,运镜,旁白,字幕,时长秒,首帧提示词,尾帧提示词";
+  const rows = project.results?.shots.map((shot) => shotToCsvRow(project, shot)) ?? [];
   return [header, ...rows].join("\n");
 }
 
@@ -73,10 +77,29 @@ export function exportProjectAsMarkdown(project: Project): string {
     .map((item) => `- ${item.shotNumber}: ${item.startSeconds}s-${item.endSeconds}s，${item.subtitle}`)
     .join("\n");
 
+  const decision = results.adaptationDecision;
+  const decisionLines = decision
+    ? [
+        `- 主创：${decision.owner}`,
+        `- 目标观众：${project.creativeBrief?.targetAudience ?? "未设置"}`,
+        `- 本轮优先：${project.creativeBrief?.priority ?? "未设置"}`,
+        `- 交付：${decision.deliveryTime}`,
+        `- 冲突：${decision.conflict}`,
+        `- 取舍：${decision.choice}`,
+        `- 观众影响：${decision.audienceEffect}`,
+        `- 结果：${decision.expectedOutcome}`,
+        `- 回看：${decision.reviewPrompt}`,
+      ].join("\n")
+    : "- 未设置本轮改编决策";
+
   return [
     `# ${project.title}`,
     "",
     `> ${results.scriptStructure.logline}`,
+    "",
+    "## 本轮改编决策",
+    "",
+    decisionLines,
     "",
     "## 剧本结构",
     "",

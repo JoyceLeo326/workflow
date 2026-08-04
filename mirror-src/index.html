@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="把一段原文变成三条可比较、可确认、可下载并能持续复盘的短剧路线。" />
+    <meta name="theme-color" content="#10100f" />
+    <link rel="stylesheet" href="./styles.css" />
+    <title>创剧 AI · 从原文走到可拍的一集</title>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="创剧 AI 首页">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span><b>创剧 AI</b><small>故事决策工作台</small></span>
+      </a>
+      <nav aria-label="页面导航">
+        <a href="#studio">开始创作</a>
+        <a href="#delivery">交付稿</a>
+        <a href="#review">复盘</a>
+      </nav>
+      <span class="local-indicator"><i></i> 当前内容保存在本机</span>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow">从原文出发，不替原文编事实</p>
+          <h1 id="hero-title">一个选择，<br /><em>改写整集走向。</em></h1>
+          <p class="hero-lede">贴入一段故事，先看三条真正不同的改编路线。你会看见每条路线保留什么、牺牲什么，再亲手确认可拍的一版。</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#studio">带着故事进去 <span aria-hidden="true">↘</span></a>
+            <span>约 3 分钟完成第一次决策</span>
+          </div>
+          <dl class="hero-facts">
+            <div><dt>03</dt><dd>条候选路线</dd></div>
+            <div><dt>01</dt><dd>个明确取舍</dd></div>
+            <div><dt>02</dt><dd>种真实下载</dd></div>
+          </dl>
+        </div>
+
+        <div class="story-stage" aria-label="故事路线预览">
+          <div class="stage-light stage-light-a"></div>
+          <div class="stage-light stage-light-b"></div>
+          <article class="stage-card stage-card-back">
+            <span>关系回声线</span><p>让秘密成为人物选择的代价。</p>
+          </article>
+          <article class="stage-card stage-card-mid">
+            <span>一景压缩线</span><p>一个地点，一件道具，一次反转。</p>
+          </article>
+          <article class="stage-card stage-card-front">
+            <div class="stage-card-top"><span>推荐路线 01</span><b>94</b></div>
+            <h2>十秒失衡线</h2>
+            <p>先给观众看见无法解释的结果，再回到选择发生之前。</p>
+            <div class="mini-timeline"><i></i><i></i><i></i><i></i><i></i></div>
+            <small>收益：追更问题清晰<br />代价：人物关系需后置补偿</small>
+          </article>
+          <div class="stage-caption"><span>原文锚点</span><strong>每一个判断，都能回到你贴入的句子。</strong></div>
+        </div>
+      </section>
+
+      <section class="studio-section" id="studio" aria-labelledby="studio-title">
+        <header class="section-heading">
+          <span>01 / 写下任务</span>
+          <div><h2 id="studio-title">先告诉故事：这一次要为谁成立。</h2><p>个人约束会真实改变推荐顺序、分段时长和下一次验证动作。</p></div>
+        </header>
+
+        <form class="mission-form" id="mission-form">
+          <div class="form-grid">
+            <label><span>怎么称呼你</span><input name="creator" maxlength="24" value="许澄" autocomplete="name" /></label>
+            <label><span>你负责的角色</span><select name="role"><option>编剧</option><option>制片统筹</option><option>IP 责编</option></select></label>
+            <label><span>这一集写给谁</span><select name="audience"><option>悬疑追更</option><option>情感共鸣</option><option>轻喜反转</option></select></label>
+            <label><span>必须守住什么</span><select name="priority"><option>悬念节奏</option><option>人物情感</option><option>低成本拍摄</option></select></label>
+            <label><span>单集时长</span><select name="minutes"><option value="1">1 分钟</option><option value="3" selected>3 分钟</option><option value="5">5 分钟</option></select></label>
+            <label><span>交付时间</span><input name="deadline" maxlength="32" value="周五 18:00" /></label>
+          </div>
+          <label class="source-field">
+            <span>原文片段 <small>建议 80–800 字</small></span>
+            <textarea name="source" rows="7" maxlength="2400">林默在停电的剧院后台找到一封没有署名的信。她以为父亲已经离开，却听见舞台上传来旧录音。灯光恢复时，信上的日期正是十年后的今天。</textarea>
+            <i><b id="source-count">66</b> / 2400</i>
+          </label>
+          <div class="form-submit">
+            <p><span aria-hidden="true">◎</span> 路线只引用当前原文，不调用外部内容。</p>
+            <button class="button button-primary" type="submit">生成三条改编路线 <span aria-hidden="true">→</span></button>
+          </div>
+        </form>
+      </section>
+
+      <section class="candidate-section is-hidden" id="candidates" aria-labelledby="candidate-title">
+        <header class="section-heading">
+          <span>02 / 比较取舍</span>
+          <div><h2 id="candidate-title">不是三个答案，是三种代价。</h2><p id="candidate-context"></p></div>
+        </header>
+        <div class="candidate-grid" id="candidate-grid" aria-live="polite"></div>
+        <div class="decision-bar">
+          <div><small>当前选择</small><strong id="selected-title">请选择一条路线</strong></div>
+          <button class="button button-primary" id="confirm-button" type="button" disabled>确认这条路线 <span aria-hidden="true">→</span></button>
+        </div>
+      </section>
+
+      <section class="delivery-section is-hidden" id="delivery" aria-labelledby="delivery-title">
+        <header class="section-heading light-heading">
+          <span>03 / 明确交付</span>
+          <div><h2 id="delivery-title">现在，它已经是一集可以讨论的稿。</h2><p>分段、原文锚点与制作代价会一起进入下载文件。</p></div>
+        </header>
+        <div class="delivery-layout">
+          <article class="delivery-paper">
+            <header><div><small>已确认路线</small><h3 id="delivery-route"></h3></div><span id="delivery-score"></span></header>
+            <p class="logline" id="delivery-logline"></p>
+            <ol class="episode-timeline" id="episode-timeline"></ol>
+          </article>
+          <aside class="delivery-aside">
+            <div class="decision-note"><small>这版主动接受的代价</small><p id="delivery-tradeoff"></p></div>
+            <div class="next-check"><small>下一次验证</small><p id="delivery-check"></p></div>
+            <div class="download-stack">
+              <button class="button button-light" id="download-md" type="button"><span>MD</span> 下载可读交付稿</button>
+              <button class="button button-ghost" id="download-json" type="button"><span>{ }</span> 下载结构化 JSON</button>
+            </div>
+            <button class="text-button" id="change-route" type="button">回去比较其他路线</button>
+          </aside>
+        </div>
+      </section>
+
+      <section class="review-section is-hidden" id="review" aria-labelledby="review-title">
+        <header class="section-heading">
+          <span>04 / 让反馈回来</span>
+          <div><h2 id="review-title">不是收下一句“不错”，而是知道下一版改哪里。</h2><p>反馈只在当前浏览器留存，并会写回新的下载稿。</p></div>
+        </header>
+        <div class="review-layout">
+          <form class="review-form" id="review-form">
+            <fieldset><legend>这条路线现在有多成立？</legend><div class="score-row">
+              <label><input type="radio" name="score" value="1" /><span>1</span></label><label><input type="radio" name="score" value="2" /><span>2</span></label><label><input type="radio" name="score" value="3" checked /><span>3</span></label><label><input type="radio" name="score" value="4" /><span>4</span></label><label><input type="radio" name="score" value="5" /><span>5</span></label>
+            </div></fieldset>
+            <label><span>最需要改变的地方</span><select name="outcome"><option>钩子不够清楚</option><option>人物动机偏弱</option><option>节奏过满</option><option>拍摄负担偏高</option><option>可以继续</option></select></label>
+            <label><span>你观察到了什么</span><textarea name="note" required maxlength="240" rows="4" placeholder="例如：读者看完后说不清那封信来自谁。"></textarea></label>
+            <button class="button button-dark" type="submit">记录复盘并生成下一步</button>
+          </form>
+          <div class="revision-panel" aria-live="polite">
+            <p class="empty-revision" id="revision-empty">第一条真实观察，会在这里变成明确的修订动作。</p>
+            <div class="is-hidden" id="revision-result"><small id="revision-version"></small><h3>下一版只改这一件事</h3><p id="revision-action"></p><blockquote id="revision-evidence"></blockquote></div>
+            <div class="review-history" id="review-history"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer><div class="brand footer-brand"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span><span><b>创剧 AI</b><small>让每次改编都有依据</small></span></div><p>内容保存在当前浏览器，可随时下载带走。</p><a href="#top">回到开头 ↑</a></footer>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

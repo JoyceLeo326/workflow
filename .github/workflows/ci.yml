@@ -33,3 +33,15 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Build public static compatibility mode
+        run: npm run build:public-mirror
+
+      - name: Smoke-test public mirror through HTTP
+        run: npm run test:public-mirror
+
+      - name: Block exposed credentials in source and build output
+        run: npm run security:secrets
+
+      - name: Block exposed credentials in public mirror
+        run: npm run security:mirror

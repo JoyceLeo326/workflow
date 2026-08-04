@@ -11,6 +11,7 @@ import {
 } from "@/lib/cost/policy";
 import { getProject, updateProject } from "@/lib/storage/project-store";
 import type { AgentStep, Project, RunEvent, WorkflowResults } from "./types";
+import { buildAdaptationDecision, countNarrativeNodes, normalizeCreativeBrief } from "./brief";
 
 const DEFAULT_BASE_URL = "https://api.deepseek.com/v1";
 const DEFAULT_MODEL = "deepseek-chat";
@@ -87,7 +88,16 @@ export async function generateWorkflowResults(project: Project): Promise<Workflo
   if (!parsed.success) {
     throw new Error("AI_PROVIDER_SCHEMA_MISMATCH：模型输出未通过结构校验。");
   }
-  return parsed.data;
+  const creativeBrief = normalizeCreativeBrief(project.creativeBrief);
+  const totalNodes = countNarrativeNodes(project.sourceText);
+  return {
+    ...parsed.data,
+    adaptationDecision: buildAdaptationDecision(
+      creativeBrief,
+      totalNodes,
+      Math.min(totalNodes, creativeBrief.episodeMinutes * 4, 12),
+    ),
+  };
 }
 
 export async function* runProjectWorkflow(projectId: string): AsyncGenerator<RunEvent> {
