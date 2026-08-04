@@ -52,6 +52,7 @@ export async function createProject(input: CreateProjectInput, options?: StoreOp
       baseUrl: input.modelConfig?.baseUrl,
       model: input.modelConfig?.model,
     },
+    creativeBrief: input.creativeBrief,
     steps: createInitialSteps(),
     createdAt: timestamp,
     updatedAt: timestamp,

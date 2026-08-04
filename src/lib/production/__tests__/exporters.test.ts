@@ -31,6 +31,23 @@ describe("production exporters", () => {
       projectTitle: "雨夜归途",
       sourceText: "这是原著正文。",
       production,
+      creativeBrief: {
+        creatorName: "许澄",
+        creatorRole: "制片统筹",
+        targetAudience: "悬疑追更",
+        priority: "低成本拍摄",
+        episodeMinutes: 1,
+        deliveryTime: "周五 18:00",
+      },
+      adaptationDecision: {
+        owner: "许澄 · 制片统筹",
+        deliveryTime: "周五 18:00",
+        conflict: "六个节点需压缩进一分钟。",
+        choice: "优先复用场景。",
+        audienceEffect: "把秘密揭示后置。",
+        expectedOutcome: "交付结构草案。",
+        reviewPrompt: "核对场景与时长。",
+      },
       docxBytes: new Uint8Array([80, 75, 3, 4]),
       pdfBytes: new Uint8Array([37, 80, 68, 70]),
     });
@@ -53,6 +70,9 @@ describe("production exporters", () => {
     expect(await zip.file("story-bible.md")?.async("string")).toBe(
       productionToMarkdown(production),
     );
+    const projectJson = JSON.parse((await zip.file("project.json")?.async("string")) ?? "{}");
+    expect(projectJson.creativeBrief.priority).toBe("低成本拍摄");
+    expect(projectJson.adaptationDecision.owner).toBe("许澄 · 制片统筹");
   });
 
   it("creates a real DOCX containing the current edited scene text", async () => {

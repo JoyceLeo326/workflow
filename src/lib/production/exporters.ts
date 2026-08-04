@@ -8,6 +8,7 @@ import {
 import { jsPDF } from "jspdf";
 import JSZip from "jszip";
 import type { ProductionDocument, ProductionScene } from "./types";
+import type { AdaptationDecision, CreativeBrief } from "@/lib/workflow/types";
 
 function safeLine(value: string) {
   return value.replace(/\r?\n/g, " ").trim();
@@ -265,6 +266,8 @@ export async function buildProjectArchive(input: {
   projectTitle: string;
   sourceText: string;
   production: ProductionDocument;
+  creativeBrief?: CreativeBrief;
+  adaptationDecision?: AdaptationDecision;
   docxBytes: Uint8Array;
   pdfBytes: Uint8Array;
 }) {
@@ -275,6 +278,8 @@ export async function buildProjectArchive(input: {
   const projectJson = JSON.stringify(
     {
       title: input.projectTitle,
+      creativeBrief: input.creativeBrief,
+      adaptationDecision: input.adaptationDecision,
       production: input.production,
     },
     null,

@@ -112,6 +112,36 @@ describe("Workbench", () => {
     expect(screen.getByRole("button", { name: "MD" })).not.toBeDisabled();
   });
 
+  it("turns role, audience, priority, and duration into a visible saved adaptation decision", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("network unavailable")));
+    render(<Workbench />);
+
+    fireEvent.change(screen.getByLabelText("主创称呼"), { target: { value: "许澄" } });
+    fireEvent.change(screen.getByLabelText("我的角色"), { target: { value: "制片统筹" } });
+    fireEvent.change(screen.getByLabelText("目标观众"), { target: { value: "悬疑追更" } });
+    fireEvent.change(screen.getByLabelText("本轮优先"), { target: { value: "低成本拍摄" } });
+    fireEvent.change(screen.getByLabelText("单集时长"), { target: { value: "1" } });
+    fireEvent.change(screen.getByLabelText("交付时间"), { target: { value: "周五 18:00" } });
+    fireEvent.change(screen.getByPlaceholderText("粘贴小说文本内容..."), {
+      target: {
+        value:
+          "雨夜，林澈回到旧城。父亲的录音突然响起。阿岚劝他离开。林澈仍走进废弃剧院。旧灯亮起。黑衣人挡住去路。",
+      },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "整理结构草案" }));
+
+    expect(await screen.findByText("许澄 · 制片统筹")).toBeInTheDocument();
+    expect(screen.getByText(/原著当前 6 个叙事节点需压缩进 1 分钟/)).toBeInTheDocument();
+    expect(screen.getAllByText(/优先合并重复地点/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/秘密揭示后置/).length).toBeGreaterThan(0);
+    expect(screen.getByText("制作可行性")).toBeInTheDocument();
+
+    const saved = window.localStorage.getItem("chuangju.projects.v1") ?? "";
+    expect(saved).toContain('"targetAudience":"悬疑追更"');
+    expect(saved).toContain('"priority":"低成本拍摄"');
+    expect(saved).toContain('"episodeMinutes":1');
+  });
+
   it("restores locally created projects after a refresh without requiring an account", async () => {
     vi.stubGlobal(
       "fetch",
@@ -188,6 +218,7 @@ describe("Workbench", () => {
     login.focus();
     await user.keyboard("{Enter}");
     expect(screen.getByRole("dialog", { name: "登录创作空间" })).toBeInTheDocument();
+    expect(screen.queryByText(/尚未开放/)).not.toBeInTheDocument();
     await user.keyboard("{Escape}");
     expect(screen.queryByRole("dialog", { name: "登录创作空间" })).not.toBeInTheDocument();
 

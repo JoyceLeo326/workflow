@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "security:secrets": "node scripts/secret-guard.mjs . .next"
   },
   "dependencies": {
     "docx": "^9.7.1",

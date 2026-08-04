@@ -33,3 +33,6 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Block exposed credentials in source and build output
+        run: npm run security:secrets

@@ -17,6 +17,30 @@ export type ModelConfig = {
   model?: string;
 };
 
+export type CreatorRole = "编剧" | "制片统筹" | "IP责编";
+export type TargetAudience = "悬疑追更" | "情感共鸣" | "轻喜反转";
+export type AdaptationPriority = "人物情感" | "悬念节奏" | "低成本拍摄";
+export type EpisodeMinutes = 1 | 3 | 5;
+
+export type CreativeBrief = {
+  creatorName: string;
+  creatorRole: CreatorRole;
+  targetAudience: TargetAudience;
+  priority: AdaptationPriority;
+  episodeMinutes: EpisodeMinutes;
+  deliveryTime: string;
+};
+
+export type AdaptationDecision = {
+  owner: string;
+  deliveryTime: string;
+  conflict: string;
+  choice: string;
+  audienceEffect: string;
+  expectedOutcome: string;
+  reviewPrompt: string;
+};
+
 export type AgentDefinition = {
   id: AgentKey;
   name: string;
@@ -104,6 +128,7 @@ export type DirectorNotes = {
 };
 
 export type WorkflowResults = {
+  adaptationDecision: AdaptationDecision;
   scriptStructure: ScriptStructure;
   characters: CharacterCard[];
   scenes: SceneCard[];
@@ -118,6 +143,7 @@ export type Project = {
   sourceText: string;
   status: ProjectStatus;
   modelConfig: ModelConfig;
+  creativeBrief?: CreativeBrief;
   steps: AgentStep[];
   results?: WorkflowResults;
   production?: ProductionDocument;
@@ -131,11 +157,13 @@ export type CreateProjectInput = {
   title: string;
   sourceText: string;
   modelConfig?: ModelConfig;
+  creativeBrief?: CreativeBrief;
 };
 
 export type WorkflowInput = {
   title: string;
   sourceText: string;
+  creativeBrief?: CreativeBrief;
 };
 
 export type RunEvent =

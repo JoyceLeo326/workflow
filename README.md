@@ -8,6 +8,7 @@
 
 - 小说输入：支持粘贴文本，浏览器端上传 `.txt` / `.md` / `.docx`
 - 结构整理：按原文顺序拆分叙事节点，保留故事来源
+- 改编任务：主创角色、目标观众、优先取舍与单集时长会实际改变结构候选、场景策略与复核动作
 - 生成服务：连接 HTTPS OpenAI-compatible 服务，Key 只保留在当前页面会话
 - AI 制作：支持自定义模型、5–300 秒超时、主动取消和 Zod Schema 校验
 - 创作编辑器：Story Bible、人物、地点、分集与场景均可编辑
@@ -16,6 +17,7 @@
 - 本地持久化：公开工作台项目保存在浏览器；服务端模式保存到 `data/projects`
 - 正式导出：Fountain、DOCX、PDF、SRT 和包含原著/当前数据/全部交付文件的项目 ZIP
 - 结构导出：Markdown、JSON、CSV
+- 交付追溯：改编冲突、选择、预期结果和回看动作会进入本地存档及导出文件
 - 模型接入：支持自定义接口地址、模型、超时与主动取消
 - 数据校验：生成结果通过 Schema 校验后才进入编辑器
 
@@ -53,6 +55,7 @@ OPENAI_MODEL=deepseek-chat
 npm test
 npm run lint
 npm run build
+npm run security:secrets
 ```
 
 ## API
