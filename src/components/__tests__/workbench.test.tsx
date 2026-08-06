@@ -1,221 +1,139 @@
 // @vitest-environment jsdom
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Workbench } from "../workbench";
 
-beforeEach(() => {
+function makeStorage() {
   const entries = new Map<string, string>();
-  const storage: Storage = {
+  return {
     get length() {
       return entries.size;
     },
     clear: () => entries.clear(),
-    getItem: (key) => entries.get(key) ?? null,
-    key: (index) => [...entries.keys()][index] ?? null,
-    removeItem: (key) => {
-      entries.delete(key);
-    },
-    setItem: (key, value) => {
-      entries.set(key, String(value));
-    },
-  };
+    getItem: (key: string) => entries.get(key) ?? null,
+    key: (index: number) => [...entries.keys()][index] ?? null,
+    removeItem: (key: string) => entries.delete(key),
+    setItem: (key: string, value: string) => entries.set(key, String(value)),
+  } satisfies Storage;
+}
+
+beforeEach(() => {
   Object.defineProperty(window, "localStorage", {
     configurable: true,
-    value: storage,
+    value: makeStorage(),
+  });
+  Object.defineProperty(URL, "createObjectURL", {
+    configurable: true,
+    value: vi.fn(() => "blob:story-delivery"),
+  });
+  Object.defineProperty(URL, "revokeObjectURL", {
+    configurable: true,
+    value: vi.fn(),
   });
 });
 
 afterEach(() => {
   vi.restoreAllMocks();
-  vi.unstubAllGlobals();
 });
 
-function mockEmptyProjects() {
-  vi.stubGlobal(
-    "fetch",
-    vi.fn().mockResolvedValue({
-      json: async () => ({ projects: [] }),
-    }),
-  );
-}
-
 describe("Workbench", () => {
-  it("opens directly on the usable production desk without an account gate", () => {
-    mockEmptyProjects();
-
+  it("opens directly on a complete story decision brief", () => {
     render(<Workbench />);
 
-    expect(screen.getByText("创剧AI")).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "把原著变成可执行的短剧方案" })).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("粘贴小说文本内容...")).toBeInTheDocument();
-    expect(screen.getByText("AI 制作管线")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "剧本结构" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "时序草案" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "载入示例" })).toBeInTheDocument();
-    expect(screen.getByText("直接创作 · 本机保存")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "整理结构草案" })).toBeDisabled();
-
-    for (const internalCopy of [
-      "零成本模式",
-      "无自动扣费",
-      "合规复刻矩阵",
-      "移动端已适配",
-      "本地 JSON 存储",
-      "本地规则冒充 AI 生成",
+    expect(screen.getByRole("link", { name: "创剧 AI 首页" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "让每个改编选择，都有原文依据。" }),
+    ).toBeInTheDocument();
+    for (const label of [
+      "项目名称",
+      "故事类型",
+      "目标观众",
+      "单集时长",
+      "叙事节奏",
+      "情绪底色",
+      "叙事视角",
+      "改编重点",
+      "制作限制",
+      "原文片段",
     ]) {
-      expect(screen.queryByText(internalCopy)).not.toBeInTheDocument();
+      expect(screen.getByLabelText(label)).toBeInTheDocument();
     }
+    expect(screen.getByRole("button", { name: "生成创作路线" })).toBeEnabled();
+    expect(screen.queryByText(String.fromCodePoint(0x767b, 0x5f55))).not.toBeInTheDocument();
   });
 
-  it("loads a polished sample script for quick mobile trials", () => {
-    mockEmptyProjects();
-
-    render(<Workbench />);
-
-    fireEvent.click(screen.getByRole("button", { name: "载入示例" }));
-
-    const textarea = screen.getByPlaceholderText("粘贴小说文本内容...") as HTMLTextAreaElement;
-    expect(textarea.value).toContain("废弃剧院");
-    expect(screen.getByRole("button", { name: "整理结构草案" })).toBeEnabled();
-  });
-
-  it("generates a truthful local structure draft without marking AI steps as completed", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi
-        .fn()
-        .mockResolvedValueOnce({
-          json: async () => ({ projects: [] }),
-        })
-        .mockRejectedValueOnce(new Error("network unavailable")),
-    );
-
-    render(<Workbench />);
-
-    fireEvent.change(screen.getByPlaceholderText("粘贴小说文本内容..."), {
-      target: {
-        value:
-          "雨夜，林澈回到旧城，发现父亲留下的录音。好友阿岚提醒他别追查，但他决定去废弃剧院寻找真相。",
-      },
-    });
-    fireEvent.click(screen.getByRole("button", { name: "整理结构草案" }));
-
-    await waitFor(() => {
-      expect(screen.getAllByText("结构草案已生成").length).toBeGreaterThan(0);
-    });
-    expect(screen.getByText("待确认类型")).toBeInTheDocument();
-    expect(screen.getAllByText("待连接").length).toBeGreaterThan(0);
-    expect(screen.queryByText("7/7")).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "MD" })).not.toBeDisabled();
-  });
-
-  it("turns role, audience, priority, and duration into a visible saved adaptation decision", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("network unavailable")));
-    render(<Workbench />);
-
-    fireEvent.change(screen.getByLabelText("主创称呼"), { target: { value: "许澄" } });
-    fireEvent.change(screen.getByLabelText("我的角色"), { target: { value: "制片统筹" } });
-    fireEvent.change(screen.getByLabelText("目标观众"), { target: { value: "悬疑追更" } });
-    fireEvent.change(screen.getByLabelText("本轮优先"), { target: { value: "低成本拍摄" } });
-    fireEvent.change(screen.getByLabelText("单集时长"), { target: { value: "1" } });
-    fireEvent.change(screen.getByLabelText("交付时间"), { target: { value: "周五 18:00" } });
-    fireEvent.change(screen.getByPlaceholderText("粘贴小说文本内容..."), {
-      target: {
-        value:
-          "雨夜，林澈回到旧城。父亲的录音突然响起。阿岚劝他离开。林澈仍走进废弃剧院。旧灯亮起。黑衣人挡住去路。",
-      },
-    });
-    fireEvent.click(screen.getByRole("button", { name: "整理结构草案" }));
-
-    expect(await screen.findByText("许澄 · 制片统筹")).toBeInTheDocument();
-    expect(screen.getByText(/原著当前 6 个叙事节点需压缩进 1 分钟/)).toBeInTheDocument();
-    expect(screen.getAllByText(/优先合并重复地点/).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/秘密揭示后置/).length).toBeGreaterThan(0);
-    expect(screen.getByText("制作可行性")).toBeInTheDocument();
-
-    const saved = window.localStorage.getItem("chuangju.projects.v1") ?? "";
-    expect(saved).toContain('"targetAudience":"悬疑追更"');
-    expect(saved).toContain('"priority":"低成本拍摄"');
-    expect(saved).toContain('"episodeMinutes":1');
-  });
-
-  it("restores locally created projects after a refresh without requiring an account", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockRejectedValue(new Error("network unavailable")),
-    );
-
-    const firstRender = render(<Workbench />);
-    fireEvent.change(screen.getByPlaceholderText("粘贴小说文本内容..."), {
-      target: { value: "第一章 雨夜。林澈回到旧城。录音里出现一个陌生名字。" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: "整理结构草案" }));
-
-    await waitFor(() => {
-      expect(window.localStorage.getItem("chuangju.projects.v1")).toContain("雨夜归途");
-    });
-
-    firstRender.unmount();
-    render(<Workbench />);
-
-    await waitFor(() => {
-      expect(screen.getByText("最近项目")).toBeInTheDocument();
-    });
-    expect(screen.getByRole("button", { name: /雨夜归途/ })).toBeInTheDocument();
-  });
-
-  it("turns the current project into an editable Story Bible and records restorable versions", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("network unavailable")));
-    render(<Workbench />);
-
-    fireEvent.change(screen.getByPlaceholderText("粘贴小说文本内容..."), {
-      target: { value: "第一章 雨夜。林澈回到旧城。录音里出现一个陌生名字。" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: "整理结构草案" }));
-    fireEvent.click(screen.getByRole("button", { name: "建立可编辑稿" }));
-
-    expect(screen.getByRole("button", { name: "Story Bible" })).toBeInTheDocument();
-    const logline = screen.getByRole("textbox", { name: "一句话故事" });
-    fireEvent.change(logline, { target: { value: "林澈循着录音回到旧城。" } });
-    fireEvent.change(screen.getByRole("textbox", { name: "版本说明" }), {
-      target: { value: "完善故事梗概" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: "保存版本" }));
-
-    expect(screen.getByText("版本 v2 已保存")).toBeInTheDocument();
-    expect(screen.getByText("v2 · 完善故事梗概")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "恢复版本 2" })).toBeInTheDocument();
-  });
-
-  it("keeps the BYOK key in page memory instead of project storage", () => {
-    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("network unavailable")));
-    render(<Workbench />);
-
-    fireEvent.change(screen.getByPlaceholderText("粘贴小说文本内容..."), {
-      target: { value: "雨夜。林澈回到旧城。" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: "整理结构草案" }));
-    fireEvent.click(screen.getByRole("button", { name: /生成服务/ }));
-    fireEvent.change(screen.getByLabelText("API Key"), {
-      target: { value: "test-session-secret-key" },
-    });
-
-    expect(screen.getByRole("button", { name: "生成剧集方案" })).toBeEnabled();
-    expect(window.localStorage.getItem("chuangju.projects.v1")).not.toContain(
-      "test-session-secret-key",
-    );
-  });
-
-  it("supports keyboard activation for provider controls", async () => {
-    mockEmptyProjects();
+  it("makes story attributes visibly change the recommended route", async () => {
     const user = userEvent.setup();
     render(<Workbench />);
 
-    const provider = screen.getByRole("button", { name: /生成服务/ });
-    provider.focus();
-    await user.keyboard("{Enter}");
-    expect(screen.getByLabelText("HTTPS 服务地址")).toBeVisible();
-    expect(screen.getByLabelText("API Key")).toBeVisible();
+    await user.selectOptions(screen.getByLabelText("故事类型"), "都市情感");
+    await user.selectOptions(screen.getByLabelText("目标观众"), "情感共鸣");
+    await user.selectOptions(screen.getByLabelText("叙事节奏"), "留白呼吸");
+    await user.selectOptions(screen.getByLabelText("情绪底色"), "温暖");
+    await user.selectOptions(screen.getByLabelText("改编重点"), "人物关系");
+    await user.click(screen.getByRole("button", { name: "生成创作路线" }));
+
+    const recommended = screen.getByTestId("candidate-relationship-echo");
+    expect(recommended).toHaveAttribute("data-recommended", "true");
+    expect(within(recommended).getByText("关系回声线")).toBeInTheDocument();
+    expect(within(recommended).getByText(/都市情感类型/)).toBeInTheDocument();
+    expect(screen.getAllByText("得到").length).toBeGreaterThanOrEqual(3);
+    expect(screen.getAllByText("放弃").length).toBeGreaterThanOrEqual(3);
+  });
+
+  it("completes selection, editing, real download, and feedback-driven next round", async () => {
+    const user = userEvent.setup();
+    const anchorClick = vi
+      .spyOn(HTMLAnchorElement.prototype, "click")
+      .mockImplementation(() => undefined);
+    render(<Workbench />);
+
+    await user.click(screen.getByRole("button", { name: "生成创作路线" }));
+    await user.click(screen.getByRole("button", { name: "选择 十秒失衡线" }));
+    await user.click(screen.getByRole("button", { name: "确认路线并生成交付" }));
+
+    expect(screen.getByRole("heading", { name: "可编辑交付稿" })).toBeInTheDocument();
+    const logline = screen.getByRole("textbox", { name: "一句话故事" });
+    fireEvent.change(logline, { target: { value: "林澈必须决定是否公开父亲留下的未来信。" } });
+    await user.click(screen.getByRole("button", { name: "下载 Markdown" }));
+    expect(anchorClick).toHaveBeenCalledTimes(1);
+
+    await user.click(screen.getByRole("radio", { name: "1 分" }));
+    await user.selectOptions(screen.getByLabelText("最需要改变的地方"), "人物动机偏弱");
+    await user.type(
+      screen.getByLabelText("观察记录"),
+      "试读者只记得信，没有说出林澈为什么回去。",
+    );
+    await user.click(screen.getByRole("button", { name: "保存反馈并进入下一轮" }));
+
+    expect(screen.getAllByText("下一轮推荐已改变").length).toBeGreaterThan(0);
+    expect(screen.getByTestId("candidate-relationship-echo")).toHaveAttribute(
+      "data-recommended",
+      "true",
+    );
+    expect(screen.getAllByText(/上轮反馈/).length).toBeGreaterThan(0);
+    expect(window.localStorage.getItem("chuangju.story-studio.v2")).toContain("人物动机偏弱");
+  });
+
+  it("restores the local feedback round after a refresh", async () => {
+    const user = userEvent.setup();
+    const first = render(<Workbench />);
+
+    await user.click(screen.getByRole("button", { name: "生成创作路线" }));
+    await user.click(screen.getByRole("button", { name: "选择 十秒失衡线" }));
+    await user.click(screen.getByRole("button", { name: "确认路线并生成交付" }));
+    await user.selectOptions(screen.getByLabelText("最需要改变的地方"), "拍摄负担偏高");
+    await user.type(screen.getByLabelText("观察记录"), "夜景切换次数超出当前排期。");
+    await user.click(screen.getByRole("button", { name: "保存反馈并进入下一轮" }));
+
+    first.unmount();
+    render(<Workbench />);
+
+    expect((await screen.findAllByText("已恢复第 2 轮创作判断")).length).toBeGreaterThan(0);
+    expect(screen.getByTestId("candidate-single-location")).toHaveAttribute(
+      "data-recommended",
+      "true",
+    );
   });
 });
