@@ -80,6 +80,7 @@ describe("Workbench", () => {
     expect(within(recommended).getByText(/都市情感类型/)).toBeInTheDocument();
     expect(screen.getAllByText("得到").length).toBeGreaterThanOrEqual(3);
     expect(screen.getAllByText("放弃").length).toBeGreaterThanOrEqual(3);
+    expect(screen.getAllByTestId("candidate-scene")).toHaveLength(4);
   });
 
   it("completes selection, editing, real download, and feedback-driven next round", async () => {
@@ -94,6 +95,13 @@ describe("Workbench", () => {
     await user.click(screen.getByRole("button", { name: "确认路线并生成交付" }));
 
     expect(screen.getByRole("heading", { name: "可编辑交付稿" })).toBeInTheDocument();
+    const storyboard = screen.getByRole("region", { name: "路线分镜参照" });
+    expect(within(storyboard).getAllByRole("img")).toHaveLength(5);
+    expect(
+      within(storyboard)
+        .getAllByRole("img")
+        .every((image) => image.getAttribute("src")?.includes("story-scenes")),
+    ).toBe(true);
     const logline = screen.getByRole("textbox", { name: "一句话故事" });
     fireEvent.change(logline, { target: { value: "林澈必须决定是否公开父亲留下的未来信。" } });
     await user.click(screen.getByRole("button", { name: "下载 Markdown" }));

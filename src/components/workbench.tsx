@@ -13,6 +13,7 @@ import {
   ShieldCheck,
   SlidersHorizontal,
 } from "lucide-react";
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { BrandMark } from "@/components/brand-mark";
 import {
@@ -35,6 +36,7 @@ import {
   type StoryPov,
   type StoryPriority,
 } from "@/lib/story-studio/engine";
+import { scenesForCandidate, type StoryScene } from "@/lib/story-studio/scenes";
 
 const STORAGE_KEY = "chuangju.story-studio.v2";
 const MAX_SOURCE_FILE_BYTES = 10 * 1024 * 1024;
@@ -109,10 +111,12 @@ function SelectField({
 
 function CandidateCard({
   candidate,
+  scene,
   selected,
   onSelect,
 }: {
   candidate: StoryCandidate;
+  scene: StoryScene;
   selected: boolean;
   onSelect: () => void;
 }) {
@@ -126,6 +130,23 @@ function CandidateCard({
       data-recommended={String(candidate.recommended)}
       data-testid={`candidate-${candidate.id}`}
     >
+      <div className="-mx-5 -mt-5 mb-5 overflow-hidden bg-[var(--ink-950)]">
+        <Image
+          alt={scene.alt}
+          className="h-44 w-full object-cover transition duration-500 hover:scale-[1.015] sm:h-52"
+          data-testid="candidate-scene"
+          height={800}
+          loading="lazy"
+          quality={78}
+          sizes="(max-width: 1023px) 100vw, 50vw"
+          src={scene.src}
+          width={1280}
+        />
+        <div className="flex min-h-9 items-center justify-between gap-3 px-4 py-2 text-[10px] text-white/70">
+          <span className="truncate">{scene.title}</span>
+          <span className="shrink-0 text-[var(--jade-400)]">{scene.beat}</span>
+        </div>
+      </div>
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="flex flex-wrap items-center gap-2">
@@ -199,6 +220,13 @@ export function Workbench() {
   const selectedCandidate = useMemo(
     () => candidates.find((candidate) => candidate.id === selectedId) ?? null,
     [candidates, selectedId],
+  );
+  const deliveryScenes = useMemo(
+    () =>
+      delivery
+        ? scenesForCandidate(delivery.decision.candidateId, delivery.brief.mood, 5)
+        : [],
+    [delivery],
   );
 
   useEffect(() => {
@@ -577,6 +605,7 @@ export function Workbench() {
                 <CandidateCard
                   key={candidate.id}
                   candidate={candidate}
+                  scene={scenesForCandidate(candidate.id, brief.mood, 1)[0]}
                   selected={selectedId === candidate.id}
                   onSelect={() => selectCandidate(candidate.id)}
                 />
@@ -621,6 +650,45 @@ export function Workbench() {
                     {delivery.decision.score}/100
                   </span>
                 </div>
+
+                <section
+                  aria-label="路线分镜参照"
+                  className="mt-6 rounded-2xl border border-black/10 bg-white p-3 sm:p-4"
+                >
+                  <div className="flex flex-wrap items-end justify-between gap-2">
+                    <div>
+                      <div className="text-[11px] font-semibold text-[var(--persimmon-600)]">
+                        路线分镜参照
+                      </div>
+                      <p className="mt-1 text-xs leading-5 text-black/45">
+                        由“{delivery.decision.title}”与“{delivery.brief.mood}”共同选出，可直接对照节拍写作。
+                      </p>
+                    </div>
+                    <span className="font-mono text-[10px] text-black/35">5 SCENES</span>
+                  </div>
+                  <ol className="mt-3 grid min-w-0 grid-cols-2 gap-2 sm:grid-cols-5">
+                    {deliveryScenes.map((scene, index) => (
+                      <li className="min-w-0 overflow-hidden rounded-xl bg-[var(--ink-950)] text-white" key={scene.id}>
+                        <Image
+                          alt={scene.alt}
+                          className="aspect-[4/3] h-auto w-full object-cover"
+                          height={800}
+                          loading="lazy"
+                          quality={76}
+                          sizes="(max-width: 639px) 45vw, 18vw"
+                          src={scene.src}
+                          width={1280}
+                        />
+                        <div className="p-2">
+                          <div className="font-mono text-[9px] text-[var(--jade-400)]">
+                            {String(index + 1).padStart(2, "0")}
+                          </div>
+                          <p className="mt-1 text-[10px] leading-4 text-white/72">{scene.beat}</p>
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
+                </section>
 
                 <label className="mt-6 block text-xs font-semibold text-black/55">
                   一句话故事
