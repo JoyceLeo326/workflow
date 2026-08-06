@@ -9,7 +9,7 @@
 1. 填写故事任务与原文，所有内容默认留在当前浏览器。
 2. 比较带有原文锚点、收益、代价和适配解释的候选路线。
 3. 选择一条路线，生成分段结构、时序与制作检查项。
-4. 下载 Markdown、JSON、Fountain、DOCX、PDF、SRT 或项目 ZIP 等真实文件。
+4. 下载包含创作决定、主动代价、分段时序、原文锚点和反馈历史的 Markdown 或 JSON 文件。
 5. 写下评分和观察，让反馈进入下一轮推荐与修订动作。
 
 核心链路不要求账号，也不依赖外部模型。服务端生成能力属于可选扩展，只有在部署方明确配置所有权和有效配额后才会启用；模型凭据不会进入浏览器构建、客户端状态或公开发布产物。
@@ -20,10 +20,10 @@
 - 原文叙事节点、人物关系、场景、镜头和时序整理
 - 面向受众、篇幅、节奏、情绪、视角、改编重点与制作限制的因果决策
 - 候选路线排序、选择理由、明确收益与制作代价
-- Story Bible、分集和场景的可编辑工作区
-- 本机项目、命名版本、版本恢复与反馈历史
-- Markdown、JSON、CSV 结构导出
-- Fountain、DOCX、PDF、SRT 与项目 ZIP 交付
+- 四条可比较的改编路线，以及随路线和情绪进入交付稿的分镜参照
+- 一句话故事和五段时序的可编辑交付工作区
+- 当前浏览器中的版本恢复与反馈历史
+- Markdown 与 JSON 真实文件交付
 - 本地 SVG 品牌标志、自托管 WebP 影像与系统字体
 - 凭据扫描、发布清单与外部运行时依赖检查
 
@@ -46,11 +46,14 @@ npm run dev
 npm test
 npm run lint
 npm run build
+npm run test:e2e
 npm run build:public-mirror
 npm run test:public-mirror
 npm run security:secrets
 npm run security:mirror
 ```
+
+`npm run qa:devices` 会先生成生产构建，再以桌面和 320、390、430 像素四组视口跑完整创作链路。验收项目、截图和线上复验命令见 [`docs/quality-evidence.md`](docs/quality-evidence.md)。
 
 ## 静态兼容产物
 

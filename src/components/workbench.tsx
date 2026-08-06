@@ -363,8 +363,8 @@ export function Workbench() {
   }
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[var(--paper-50)] text-[var(--ink-950)]">
-      <header className="sticky top-0 z-40 border-b border-white/10 bg-[color:var(--ink-950)]/96 text-white backdrop-blur-xl">
+    <main className="studio-shell min-h-[100dvh] overflow-x-hidden bg-[var(--paper-50)] text-[var(--ink-950)]">
+      <header className="studio-header sticky top-0 z-40 border-b border-white/10 bg-[color:var(--ink-950)]/96 text-white backdrop-blur-xl">
         <div className="mx-auto flex min-h-16 max-w-[1500px] items-center gap-3 px-4 py-2 sm:px-6">
           <a className="flex min-h-11 min-w-0 items-center gap-3" href="#top" aria-label="创剧 AI 首页">
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[var(--paper-50)] text-[var(--ink-950)]">
@@ -860,7 +860,7 @@ export function Workbench() {
         </section>
       ) : null}
 
-      <footer className="border-t border-black/10 bg-[var(--paper-50)]">
+      <footer className="studio-footer border-t border-black/10 bg-[var(--paper-50)]">
         <div className="mx-auto flex max-w-[1500px] flex-col gap-4 px-4 py-8 sm:px-6 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-3">
             <BrandMark className="h-9 w-9" decorative />
@@ -874,7 +874,7 @@ export function Workbench() {
       </footer>
 
       {candidates.length && !delivery ? (
-        <div className="fixed inset-x-3 bottom-[max(.75rem,env(safe-area-inset-bottom))] z-30 rounded-2xl border border-white/10 bg-[var(--ink-950)]/96 p-3 text-white shadow-2xl backdrop-blur md:hidden">
+        <div className="mobile-action fixed right-[max(.75rem,env(safe-area-inset-right))] bottom-[max(.75rem,env(safe-area-inset-bottom))] left-[max(.75rem,env(safe-area-inset-left))] z-30 rounded-2xl border border-white/10 bg-[var(--ink-950)]/96 p-3 text-white shadow-2xl backdrop-blur md:hidden">
           <div className="flex items-center gap-3">
             <div className="min-w-0 flex-1">
               <div className="truncate text-xs font-semibold">

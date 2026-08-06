@@ -25,15 +25,33 @@
 }
 
 html {
+  min-width: 320px;
+  min-height: 100%;
   background: var(--background);
   scroll-behavior: smooth;
 }
 
 body {
   min-width: 320px;
+  min-height: 100dvh;
+  overflow-x: clip;
   background: var(--background);
   color: var(--foreground);
   text-rendering: optimizeLegibility;
+}
+
+.studio-header {
+  padding-top: env(safe-area-inset-top);
+}
+
+.studio-footer {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+@media (max-width: 767px) {
+  .studio-shell:has(input:focus, textarea:focus, select:focus) .mobile-action {
+    display: none;
+  }
 }
 
 button,

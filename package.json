@@ -8,11 +8,13 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
+    "test:e2e": "playwright test",
+    "qa:devices": "npm run build && npm run test:e2e",
     "build:public-mirror": "node scripts/build-public-mirror.mjs",
     "test:public-mirror": "node scripts/http-mirror-smoke.mjs",
     "security:secrets": "node scripts/secret-guard.mjs . .next",
     "security:mirror": "node scripts/secret-guard.mjs public-mirror",
-    "quality": "npm run lint && npm test && npm run build && npm run build:public-mirror && npm run test:public-mirror && npm run security:secrets && npm run security:mirror"
+    "quality": "npm run lint && npm test && npm run build && npm run test:e2e && npm run build:public-mirror && npm run test:public-mirror && npm run security:secrets && npm run security:mirror"
   },
   "dependencies": {
     "docx": "^9.7.1",
@@ -26,6 +28,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
