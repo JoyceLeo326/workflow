@@ -31,7 +31,7 @@ describe("public deployment readiness", () => {
     }
   });
 
-  it("declares a minimal Vercel contract that forces the browser-safe demo", async () => {
+  it("declares a minimal Vercel contract that forces browser-safe offline operation", async () => {
     const vercelConfigPath = join(projectRoot, "vercel.json");
 
     expect(existsSync(vercelConfigPath)).toBe(true);
@@ -48,25 +48,25 @@ describe("public deployment readiness", () => {
     });
 
     const previousVercel = process.env.VERCEL;
-    const previousBrowserDemo = process.env.NEXT_PUBLIC_BROWSER_DEMO;
+    const previousOfflineMode = process.env.NEXT_PUBLIC_OFFLINE_MODE;
     const previousCostMode = process.env.COST_MODE;
     process.env.VERCEL = "1";
-    delete process.env.NEXT_PUBLIC_BROWSER_DEMO;
+    delete process.env.NEXT_PUBLIC_OFFLINE_MODE;
     delete process.env.COST_MODE;
     vi.resetModules();
 
     try {
       const { default: nextConfig } = await import("../../../next.config");
       expect(nextConfig.env).toMatchObject({
-        NEXT_PUBLIC_BROWSER_DEMO: "1",
+        NEXT_PUBLIC_OFFLINE_MODE: "1",
         NEXT_PUBLIC_COST_MODE: "zero_owner_cost",
         NEXT_PUBLIC_PROVIDER_STATUS: "not_connected",
       });
     } finally {
       if (previousVercel === undefined) delete process.env.VERCEL;
       else process.env.VERCEL = previousVercel;
-      if (previousBrowserDemo === undefined) delete process.env.NEXT_PUBLIC_BROWSER_DEMO;
-      else process.env.NEXT_PUBLIC_BROWSER_DEMO = previousBrowserDemo;
+      if (previousOfflineMode === undefined) delete process.env.NEXT_PUBLIC_OFFLINE_MODE;
+      else process.env.NEXT_PUBLIC_OFFLINE_MODE = previousOfflineMode;
       if (previousCostMode === undefined) delete process.env.COST_MODE;
       else process.env.COST_MODE = previousCostMode;
       vi.resetModules();

@@ -1,1165 +1,901 @@
 "use client";
 
 import {
-  BookOpenText,
-  CheckCircle2,
+  ArrowDownRight,
+  ArrowRight,
+  Check,
   ChevronRight,
-  CircleDot,
-  Clapperboard,
-  Clock3,
   Download,
   FileText,
-  Film,
-  FolderOpen,
-  Layers3,
-  Loader2,
-  LockKeyhole,
-  Play,
-  Sparkles,
-  Upload,
-  UserPlus,
-  Wand2,
-  X,
-  type LucideIcon,
+  FolderInput,
+  MessageSquareText,
+  RotateCcw,
+  ShieldCheck,
+  SlidersHorizontal,
 } from "lucide-react";
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import { ProductionWorkspace } from "@/components/production-workspace";
-import { createInitialSteps } from "@/lib/workflow/agents";
+import { BrandMark } from "@/components/brand-mark";
 import {
-  exportProjectAsCsv,
-  exportProjectAsJson,
-  exportProjectAsMarkdown,
-} from "@/lib/workflow/exporters";
-import { buildFallbackWorkflowResult } from "@/lib/workflow/fallback";
-import {
-  DEFAULT_CREATIVE_BRIEF,
-  normalizeCreativeBrief,
-  priorityChoices,
-} from "@/lib/workflow/brief";
-import type {
-  AgentStep,
-  CharacterCard,
-  CreativeBrief,
-  EpisodeMinutes,
-  Project,
-  SceneCard,
-  ShotCard,
-  TimelineItem,
-} from "@/lib/workflow/types";
+  applyStoryFeedback,
+  buildStoryDelivery,
+  buildStoryDownloads,
+  generateStoryCandidates,
+  normalizeStoryBrief,
+  type FeedbackIssue,
+  type FeedbackMemory,
+  type StoryAudience,
+  type StoryBrief,
+  type StoryCandidate,
+  type StoryConstraint,
+  type StoryDelivery,
+  type StoryGenre,
+  type StoryMinutes,
+  type StoryMood,
+  type StoryPace,
+  type StoryPov,
+  type StoryPriority,
+} from "@/lib/story-studio/engine";
+import { scenesForCandidate, type StoryScene } from "@/lib/story-studio/scenes";
 
-type ResultTab = "structure" | "characters" | "scenes" | "shots" | "timeline";
-type ExportFormat = "md" | "json" | "csv";
-type AccountMode = "login" | "register" | null;
-
-const IS_BROWSER_MODE = process.env.NEXT_PUBLIC_BROWSER_DEMO === "1";
-const LOCAL_PROJECT_PREFIX = "local-";
-const LOCAL_PROJECTS_KEY = "chuangju.projects.v1";
+const STORAGE_KEY = "chuangju.story-studio.v2";
 const MAX_SOURCE_FILE_BYTES = 10 * 1024 * 1024;
-const SAMPLE_TITLE = "雨夜归途";
-const SAMPLE_SOURCE_TEXT =
-  "雨夜，林澈回到旧城，发现父亲留下的录音。好友阿岚提醒他别追查，但他决定去废弃剧院寻找真相。剧院深处，一盏旧灯忽然亮起，录音里传出母亲的名字。黑衣人现身阻止他，阿岚被迫说出当年的秘密。黎明前，林澈站上废弃舞台，终于明白父亲真正想保护的人是谁。";
+const DEFAULT_BRIEF = normalizeStoryBrief({
+  sourceText:
+    "雨夜，林澈回到旧城剧院。父亲留下的录音突然响起。阿岚劝他不要追查。林澈仍走上舞台。停电后，一封写着未来日期的信落在聚光灯下。",
+});
 
-const resultTabs: Array<{ id: ResultTab; label: string }> = [
-  { id: "structure", label: "剧本结构" },
-  { id: "characters", label: "人物卡" },
-  { id: "scenes", label: "场景卡" },
-  { id: "shots", label: "镜头表" },
-  { id: "timeline", label: "时序草案" },
-];
+type StoredStudio = {
+  brief: StoryBrief;
+  candidates: StoryCandidate[];
+  selectedId: string | null;
+  delivery: StoryDelivery | null;
+  memory?: FeedbackMemory;
+};
 
-const productionStages = ["原著", "剧情拆解", "分集规划", "标准剧本", "可编辑分镜", "交付包"];
+const fieldClass =
+  "mt-2 min-h-11 w-full rounded-xl border border-black/10 bg-white px-3 text-sm text-[var(--ink-950)] outline-none transition focus:border-[var(--persimmon-500)] focus:ring-4 focus:ring-orange-100";
 
-function formatDuration(seconds: number) {
-  const minutes = Math.floor(seconds / 60);
-  const rest = seconds % 60;
-  return `${minutes}:${String(rest).padStart(2, "0")}`;
-}
-
-function readLocalProjects(): Project[] {
-  if (typeof window === "undefined") return [];
+function saveStudio(state: StoredStudio) {
   try {
-    const parsed = JSON.parse(window.localStorage.getItem(LOCAL_PROJECTS_KEY) ?? "[]") as unknown;
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter(
-      (item): item is Project =>
-        Boolean(
-          item &&
-            typeof item === "object" &&
-            "id" in item &&
-            typeof item.id === "string" &&
-            "title" in item &&
-            typeof item.title === "string" &&
-            "sourceText" in item &&
-            typeof item.sourceText === "string",
-        ),
-    );
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   } catch {
-    return [];
+    // The active session remains usable when browser storage is unavailable.
   }
 }
 
-function persistLocalProjects(projects: Project[]) {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(LOCAL_PROJECTS_KEY, JSON.stringify(projects.slice(0, 24)));
-  } catch {
-    // A full or unavailable browser store must not block the active editing session.
-  }
-}
-
-function createLocalDraftProject(
-  title: string,
-  sourceText: string,
-  creativeBrief: CreativeBrief,
-): Project {
-  const now = new Date().toISOString();
-  return {
-    id: `${LOCAL_PROJECT_PREFIX}${globalThis.crypto?.randomUUID?.() ?? Date.now()}`,
-    title: title.trim() || "未命名项目",
-    sourceText: sourceText.trim(),
-    status: "completed",
-    modelConfig: { model: "local-structure" },
-    creativeBrief,
-    steps: createInitialSteps(),
-    results: buildFallbackWorkflowResult({
-      title: title.trim() || "未命名项目",
-      sourceText,
-      creativeBrief,
-    }),
-    createdAt: now,
-    updatedAt: now,
-  };
-}
-
-function isLocalProject(project: Project) {
-  return project.id.startsWith(LOCAL_PROJECT_PREFIX);
-}
-
-function downloadTextFile(filename: string, contentType: string, content: string) {
-  const blob = new Blob([content], { type: `${contentType};charset=utf-8` });
-  const url = URL.createObjectURL(blob);
+function downloadFile(filename: string, content: string, contentType: string) {
+  const url = URL.createObjectURL(new Blob([content], { type: `${contentType};charset=utf-8` }));
   const anchor = document.createElement("a");
   anchor.href = url;
   anchor.download = filename;
   document.body.append(anchor);
   anchor.click();
   anchor.remove();
-  URL.revokeObjectURL(url);
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-function exportLocalProject(project: Project, format: ExportFormat) {
-  const baseName = project.title.trim() || "chuangju-project";
-  if (format === "json") {
-    downloadTextFile(`${baseName}.json`, "application/json", exportProjectAsJson(project));
-    return;
-  }
-  if (format === "csv") {
-    downloadTextFile(`${baseName}.csv`, "text/csv", exportProjectAsCsv(project));
-    return;
-  }
-  downloadTextFile(`${baseName}.md`, "text/markdown", exportProjectAsMarkdown(project));
+function safeFilename(value: string) {
+  return value.replace(/[\\/:*?"<>|]+/g, "-").trim() || "chuangju-story";
 }
 
-function AccountDialog({
-  mode,
-  creatorName,
-  onClose,
-  onSave,
+function SelectField({
+  label,
+  value,
+  options,
+  onChange,
 }: {
-  mode: AccountMode;
-  creatorName: string;
-  onClose: () => void;
-  onSave: (creatorName: string) => void;
+  label: string;
+  value: string | number;
+  options: Array<{ value: string | number; label: string }>;
+  onChange: (value: string) => void;
 }) {
-  const [name, setName] = useState(creatorName);
-
-  useEffect(() => {
-    if (!mode) return;
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
-  }, [mode, onClose]);
-
-  if (!mode) return null;
-  const title = mode === "login" ? "登录创作空间" : "创建创作空间";
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="presentation">
-      <button
-        aria-label="关闭账号窗口"
-        className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"
-        type="button"
-        onClick={onClose}
-      />
-      <section
-        aria-labelledby="account-title"
-        aria-modal="true"
-        className="relative w-full max-w-md rounded-3xl border border-white/10 bg-white p-6 shadow-2xl"
-        role="dialog"
+    <label className="block min-w-0 text-xs font-medium text-black/60">
+      {label}
+      <select
+        aria-label={label}
+        className={fieldClass}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
       >
-        <button
-          aria-label="关闭"
-          className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full text-slate-500 hover:bg-slate-100"
-          type="button"
-          onClick={onClose}
-        >
-          <X className="h-4 w-4" aria-hidden="true" />
-        </button>
-        <div className="grid h-11 w-11 place-items-center rounded-2xl bg-violet-100 text-violet-700">
-          <LockKeyhole className="h-5 w-5" aria-hidden="true" />
-        </div>
-        <h2 id="account-title" className="mt-5 text-xl font-semibold text-slate-950">
-          {title}
-        </h2>
-        <p className="mt-2 text-sm leading-6 text-slate-600">
-          设置主创称呼，之后创建的任务、版本与导出文件会沿用这份署名。
-        </p>
-        <form
-          className="mt-5"
-          onSubmit={(event) => {
-            event.preventDefault();
-            onSave(name);
-          }}
-        >
-          <label className="block text-xs font-medium text-slate-600" htmlFor="account-creator-name">
-            主创称呼
-          </label>
-          <input
-            id="account-creator-name"
-            autoComplete="name"
-            className="mt-2 h-11 w-full rounded-xl border border-slate-200 px-3 text-sm focus:border-violet-400"
-            maxLength={24}
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-          />
-          <button
-            className="mt-4 h-11 w-full rounded-xl bg-slate-950 text-sm font-semibold text-white hover:bg-violet-700"
-            type="submit"
-          >
-            {mode === "login" ? "进入创作空间" : "创建创作空间"}
-          </button>
-        </form>
-      </section>
-    </div>
+        {options.map((option) => (
+          <option key={String(option.value)} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </label>
   );
 }
 
-function EmptyPanel({
-  icon: Icon,
-  title,
-  description,
+function CandidateCard({
+  candidate,
+  scene,
+  selected,
+  onSelect,
 }: {
-  icon: LucideIcon;
-  title: string;
-  description: string;
+  candidate: StoryCandidate;
+  scene: StoryScene;
+  selected: boolean;
+  onSelect: () => void;
 }) {
   return (
-    <div className="flex min-h-72 flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 p-8 text-center">
-      <div className="grid h-12 w-12 place-items-center rounded-2xl bg-white text-slate-500 shadow-sm">
-        <Icon className="h-5 w-5" aria-hidden="true" />
-      </div>
-      <h3 className="mt-4 text-sm font-semibold text-slate-900">{title}</h3>
-      <p className="mt-2 max-w-sm text-xs leading-6 text-slate-500">{description}</p>
-    </div>
-  );
-}
-
-function StructureView({ project }: { project: Project | null }) {
-  const structure = project?.results?.scriptStructure;
-  if (!structure) {
-    return (
-      <EmptyPanel
-        icon={Layers3}
-        title="等待原著"
-        description="粘贴或上传原著后，先整理叙事节点，再继续人物、场景和分镜创作。"
-      />
-    );
-  }
-
-  return (
-    <div className="space-y-4">
-      {project.results?.adaptationDecision ? (
-        <section className="overflow-hidden rounded-2xl border border-violet-200 bg-[#17131f] text-white">
-          <div className="grid gap-px bg-white/10 lg:grid-cols-[0.8fr_1.2fr_1.2fr]">
-            <div className="bg-[#17131f] p-5">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-violet-300">
-                本轮任务
-              </div>
-              <h3 className="mt-3 text-lg font-semibold">{project.results.adaptationDecision.owner}</h3>
-              <p className="mt-2 text-xs text-white/55">交付节点 · {project.results.adaptationDecision.deliveryTime}</p>
-            </div>
-            <div className="bg-[#17131f] p-5">
-              <div className="text-[11px] font-semibold text-amber-300">容量冲突</div>
-              <p className="mt-2 text-xs leading-6 text-white/70">
-                {project.results.adaptationDecision.conflict}
-              </p>
-              <div className="mt-4 text-[11px] font-semibold text-violet-300">本轮取舍</div>
-              <p className="mt-2 text-xs leading-6 text-white/70">
-                {project.results.adaptationDecision.choice}
-              </p>
-            </div>
-            <div className="bg-[#17131f] p-5">
-              <div className="text-[11px] font-semibold text-emerald-300">观众影响与回看</div>
-              <p className="mt-2 text-xs leading-6 text-white/70">
-                {project.results.adaptationDecision.audienceEffect}
-              </p>
-              <p className="mt-3 border-t border-white/10 pt-3 text-xs leading-6 text-white/70">
-                {project.results.adaptationDecision.reviewPrompt}
-              </p>
-              <a
-                className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-xl bg-white px-4 text-xs font-semibold text-slate-950 hover:bg-violet-50"
-                href="#production"
-              >
-                确认取舍，继续分集
-                <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
-              </a>
-            </div>
-          </div>
-        </section>
-      ) : null}
-      <section className="rounded-2xl border border-slate-200 bg-white p-5">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-600">
-              {structure.genre}
-            </div>
-            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
-              {structure.title}
-            </h2>
-          </div>
-          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600">
-            {project?.modelConfig.model === "local-structure" ? "结构草案" : "AI 版本"}
-          </span>
+    <article
+      className={`relative min-w-0 overflow-hidden rounded-[1.65rem] border p-5 transition ${
+        selected
+          ? "border-[var(--persimmon-500)] bg-[#fff8f1] shadow-[0_18px_60px_rgba(240,90,60,0.12)]"
+          : "border-black/10 bg-white hover:border-black/25"
+      }`}
+      data-recommended={String(candidate.recommended)}
+      data-testid={`candidate-${candidate.id}`}
+    >
+      <div className="-mx-5 -mt-5 mb-5 overflow-hidden bg-[var(--ink-950)]">
+        <Image
+          alt={scene.alt}
+          className="h-44 w-full object-cover transition duration-500 hover:scale-[1.015] sm:h-52"
+          data-testid="candidate-scene"
+          height={800}
+          loading="lazy"
+          quality={78}
+          sizes="(max-width: 1023px) 100vw, 50vw"
+          src={scene.src}
+          width={1280}
+        />
+        <div className="flex min-h-9 items-center justify-between gap-3 px-4 py-2 text-[10px] text-white/70">
+          <span className="truncate">{scene.title}</span>
+          <span className="shrink-0 text-[var(--jade-400)]">{scene.beat}</span>
         </div>
-        <p className="mt-4 text-sm leading-7 text-slate-600">{structure.logline}</p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {structure.themes.map((theme) => (
-            <span key={theme} className="rounded-full bg-violet-50 px-3 py-1 text-xs text-violet-700">
-              {theme}
-            </span>
-          ))}
-        </div>
-      </section>
-
-      <div className="grid gap-3 xl:grid-cols-3">
-        {structure.acts.map((act, index) => (
-          <article key={act.name} className="rounded-2xl border border-slate-200 bg-white p-4">
-            <div className="flex items-center gap-3">
-              <span className="grid h-8 w-8 place-items-center rounded-xl bg-slate-950 font-mono text-xs text-white">
-                {String(index + 1).padStart(2, "0")}
-              </span>
-              <h3 className="text-sm font-semibold text-slate-950">{act.name}</h3>
-            </div>
-            <p className="mt-3 text-xs leading-6 text-slate-500">{act.purpose}</p>
-            <ol className="mt-4 space-y-2">
-              {act.beats.length ? (
-                act.beats.map((beat, beatIndex) => (
-                  <li key={`${beat}-${beatIndex}`} className="flex gap-2 text-xs leading-6 text-slate-700">
-                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-400" />
-                    <span>{beat}</span>
-                  </li>
-                ))
-              ) : (
-                <li className="text-xs text-slate-400">当前原著没有更多可拆分节点</li>
-              )}
-            </ol>
-          </article>
-        ))}
       </div>
-    </div>
-  );
-}
-
-function CharacterView({ characters }: { characters?: CharacterCard[] }) {
-  if (!characters?.length) {
-    return (
-      <EmptyPanel
-        icon={BookOpenText}
-        title="人物仍待确认"
-        description="结构整理不会猜测人物身份。连接生成服务后可依据原文提取人物候选，再由你确认。"
-      />
-    );
-  }
-
-  return (
-    <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-      {characters.map((character) => (
-        <article key={character.id} className="rounded-2xl border border-slate-200 bg-white p-4">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <h3 className="font-semibold text-slate-950">{character.name}</h3>
-              <p className="mt-1 text-xs text-violet-600">{character.role}</p>
-            </div>
-            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] text-slate-500">候选</span>
-          </div>
-          <p className="mt-4 text-xs leading-6 text-slate-600">{character.profile}</p>
-          <div className="mt-4 rounded-xl bg-slate-50 p-3 text-xs leading-6 text-slate-600">
-            <strong className="text-slate-800">目标：</strong>
-            {character.goal}
-          </div>
-        </article>
-      ))}
-    </div>
-  );
-}
-
-function SceneView({ scenes }: { scenes?: SceneCard[] }) {
-  if (!scenes?.length) {
-    return (
-      <EmptyPanel
-        icon={Film}
-        title="场景仍待拆分"
-        description="结构整理只保留原文节点，不会补写地点、时间和美术设定。"
-      />
-    );
-  }
-
-  return (
-    <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-      {scenes.map((scene) => (
-        <article key={scene.id} className="rounded-2xl border border-slate-200 bg-white p-4">
-          <div className="text-xs font-medium text-violet-600">
-            {scene.time} · {scene.location}
-          </div>
-          <h3 className="mt-2 font-semibold text-slate-950">{scene.name}</h3>
-          <p className="mt-2 text-xs leading-6 text-slate-500">{scene.mood}</p>
-          <ul className="mt-4 space-y-2">
-            {scene.keyEvents.map((event) => (
-              <li key={event} className="rounded-xl bg-slate-50 p-3 text-xs leading-6 text-slate-700">
-                {event}
-              </li>
-            ))}
-          </ul>
-        </article>
-      ))}
-    </div>
-  );
-}
-
-function ShotsView({ shots }: { shots?: ShotCard[] }) {
-  if (!shots?.length) {
-    return (
-      <EmptyPanel
-        icon={Clapperboard}
-        title="镜头表为空"
-        description="完成结构整理后，原文节点会进入镜头工作表，供你继续设计景别与运镜。"
-      />
-    );
-  }
-
-  return (
-    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-      <div className="hidden grid-cols-[72px_130px_1fr_90px_90px_70px] border-b border-slate-200 bg-slate-50 px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500 lg:grid">
-        <span>镜号</span>
-        <span>场景</span>
-        <span>原文节点 / 画面</span>
-        <span>景别</span>
-        <span>运镜</span>
-        <span>时长</span>
-      </div>
-      {shots.map((shot) => (
-        <article
-          key={shot.id}
-          className="grid gap-3 border-b border-slate-100 px-4 py-4 text-sm last:border-b-0 lg:grid-cols-[72px_130px_1fr_90px_90px_70px]"
-        >
-          <span className="font-mono text-xs font-semibold text-violet-700">{shot.shotNumber}</span>
-          <span className="text-xs text-slate-500">{shot.scene}</span>
-          <p className="text-xs leading-6 text-slate-700">{shot.visual}</p>
-          <span className="text-xs text-slate-500">{shot.shotSize}</span>
-          <span className="text-xs text-slate-500">{shot.cameraMove}</span>
-          <span className="font-mono text-xs text-slate-500">{shot.durationSeconds}s</span>
-        </article>
-      ))}
-    </div>
-  );
-}
-
-function TimelineView({ items, total }: { items?: TimelineItem[]; total?: number }) {
-  if (!items?.length) {
-    return (
-      <EmptyPanel
-        icon={Clock3}
-        title="时序草案为空"
-        description="这里会展示镜头顺序与估算时长；只有存在真实媒体时才会进入可播放预演。"
-      />
-    );
-  }
-
-  return (
-    <div className="space-y-3">
-      <section className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-5">
+      <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="text-xs text-slate-500">估算总时长</div>
-          <div className="mt-1 font-mono text-2xl font-semibold text-slate-950">
-            {formatDuration(total ?? 0)}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-black/45">
+              {candidate.badge}
+            </span>
+            {candidate.recommended ? (
+              <span className="rounded-full bg-[var(--persimmon-500)] px-2.5 py-1 text-[10px] font-semibold text-white">
+                当前推荐
+              </span>
+            ) : null}
           </div>
+          <h3 className="mt-3 text-xl font-semibold tracking-tight text-[var(--ink-950)]">
+            {candidate.title}
+          </h3>
         </div>
-        <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700">
-          暂无媒体
-        </span>
-      </section>
-      {items.map((item) => {
-        const duration = item.endSeconds - item.startSeconds;
-        return (
-          <article key={item.shotNumber} className="rounded-2xl border border-slate-200 bg-white p-4">
-            <div className="flex items-center gap-3">
-              <span className="w-10 font-mono text-xs font-semibold text-violet-700">
-                {item.shotNumber}
-              </span>
-              <div className="h-2 min-w-0 flex-1 overflow-hidden rounded-full bg-slate-100">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500"
-                  style={{ width: `${Math.max(8, (duration / (total || 1)) * 100)}%` }}
-                />
-              </div>
-              <span className="font-mono text-xs text-slate-500">
-                {item.startSeconds}s–{item.endSeconds}s
-              </span>
-            </div>
-            <p className="mt-3 text-xs leading-6 text-slate-700">{item.subtitle}</p>
-          </article>
-        );
-      })}
-    </div>
-  );
-}
+        <div className="shrink-0 font-mono text-2xl font-semibold text-[var(--persimmon-600)]">
+          {candidate.score}
+        </div>
+      </div>
 
-function StepStatus({ step }: { step: AgentStep }) {
-  if (step.status === "completed") {
-    return (
-      <span className="inline-flex items-center gap-1 text-emerald-600">
-        <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
-        已完成
-      </span>
-    );
-  }
-  if (step.status === "running") {
-    return (
-      <span className="inline-flex items-center gap-1 text-violet-600">
-        <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
-        处理中
-      </span>
-    );
-  }
-  if (step.status === "failed") return <span className="text-rose-600">失败</span>;
-  return <span className="text-slate-400">待连接</span>;
+      <p className="mt-4 text-sm leading-7 text-black/65">{candidate.thesis}</p>
+      <p className="mt-3 rounded-2xl bg-[var(--paper-50)] p-3 text-xs leading-6 text-black/60">
+        {candidate.reason}
+      </p>
+
+      <div className="mt-4 grid gap-2 sm:grid-cols-2">
+        <div className="rounded-2xl border border-emerald-900/10 bg-emerald-50/60 p-3">
+          <div className="text-[11px] font-semibold text-emerald-800">得到</div>
+          <p className="mt-2 text-xs leading-6 text-emerald-950/70">{candidate.gain}</p>
+        </div>
+        <div className="rounded-2xl border border-orange-900/10 bg-orange-50/70 p-3">
+          <div className="text-[11px] font-semibold text-orange-800">放弃</div>
+          <p className="mt-2 text-xs leading-6 text-orange-950/70">{candidate.tradeoff}</p>
+        </div>
+      </div>
+
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-black/8 pt-4">
+        <span className="text-xs text-black/50">{candidate.production.summary}</span>
+        <button
+          aria-label={`选择 ${candidate.title}`}
+          aria-pressed={selected}
+          className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 text-xs font-semibold transition ${
+            selected
+              ? "bg-[var(--ink-950)] text-white"
+              : "border border-black/10 bg-white text-[var(--ink-950)] hover:border-[var(--persimmon-500)]"
+          }`}
+          type="button"
+          onClick={onSelect}
+        >
+          {selected ? <Check className="h-4 w-4" aria-hidden="true" /> : null}
+          {selected ? "已选择" : "选择路线"}
+        </button>
+      </div>
+    </article>
+  );
 }
 
 export function Workbench() {
-  const [title, setTitle] = useState(SAMPLE_TITLE);
-  const [sourceText, setSourceText] = useState("");
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [project, setProject] = useState<Project | null>(null);
-  const [steps, setSteps] = useState<AgentStep[]>(createInitialSteps());
-  const [activeTab, setActiveTab] = useState<ResultTab>("structure");
-  const [isRunning, setIsRunning] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [message, setMessage] = useState("导入原著，开始整理");
-  const [accountMode, setAccountMode] = useState<AccountMode>(null);
-  const [creativeBrief, setCreativeBrief] = useState<CreativeBrief>({ ...DEFAULT_CREATIVE_BRIEF });
+  const [brief, setBrief] = useState<StoryBrief>(DEFAULT_BRIEF);
+  const [candidates, setCandidates] = useState<StoryCandidate[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [delivery, setDelivery] = useState<StoryDelivery | null>(null);
+  const [memory, setMemory] = useState<FeedbackMemory | undefined>();
+  const [status, setStatus] = useState("内容保存在当前浏览器");
+  const [feedbackScore, setFeedbackScore] = useState(3);
+  const [feedbackIssue, setFeedbackIssue] = useState<FeedbackIssue>("钩子不够清楚");
+  const [feedbackNote, setFeedbackNote] = useState("");
+  const [isReadingFile, setIsReadingFile] = useState(false);
 
-  const results = project?.results;
-  const canRun = sourceText.trim().length > 0 && !isRunning;
-  const progress = useMemo(() => {
-    if (!steps.length) return 0;
-    return Math.round(steps.reduce((sum, step) => sum + step.progress, 0) / steps.length);
-  }, [steps]);
+  const selectedCandidate = useMemo(
+    () => candidates.find((candidate) => candidate.id === selectedId) ?? null,
+    [candidates, selectedId],
+  );
+  const deliveryScenes = useMemo(
+    () =>
+      delivery
+        ? scenesForCandidate(delivery.decision.candidateId, delivery.brief.mood, 5)
+        : [],
+    [delivery],
+  );
 
   useEffect(() => {
     let cancelled = false;
-    void Promise.resolve().then(() => {
+    queueMicrotask(() => {
       if (cancelled) return;
-      const localProjects = readLocalProjects();
-      setProjects(localProjects);
-      if (localProjects[0]) {
-        const latest = localProjects[0];
-        setProject(latest);
-        setTitle(latest.title);
-        setSourceText(latest.sourceText);
-        setSteps(latest.steps);
-        setCreativeBrief(normalizeCreativeBrief(latest.creativeBrief));
-        setMessage(`已恢复 ${latest.title}`);
+      try {
+        const stored = JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? "null") as
+          | StoredStudio
+          | null;
+        if (!stored?.brief || !Array.isArray(stored.candidates)) return;
+        const restoredBrief = normalizeStoryBrief(stored.brief);
+        const restoredCandidates = stored.memory
+          ? generateStoryCandidates(restoredBrief, stored.memory)
+          : stored.candidates;
+        setBrief(restoredBrief);
+        setCandidates(restoredCandidates);
+        setSelectedId(stored.selectedId ?? null);
+        setDelivery(stored.delivery ?? null);
+        setMemory(stored.memory);
+        if (stored.memory?.round) setStatus(`已恢复第 ${stored.memory.round} 轮创作判断`);
+      } catch {
+        window.localStorage.removeItem(STORAGE_KEY);
       }
     });
-
-    if (IS_BROWSER_MODE) {
-      return () => {
-        cancelled = true;
-      };
-    }
-
-    fetch("/api/projects")
-      .then(async (response) => {
-        if (!response.ok) throw new Error("项目列表读取失败");
-        return (await response.json()) as { projects?: Project[] };
-      })
-      .then((payload) => {
-        const remoteProjects = payload.projects ?? [];
-        if (!remoteProjects.length) return;
-        setProjects((current) => {
-          const knownIds = new Set(remoteProjects.map((item) => item.id));
-          return [...remoteProjects, ...current.filter((item) => !knownIds.has(item.id))];
-        });
-      })
-      .catch(() => undefined);
 
     return () => {
       cancelled = true;
     };
   }, []);
 
-  function mergeProject(nextProject: Project) {
-    setProject(nextProject);
-    setProjects((current) => {
-      const next = [nextProject, ...current.filter((item) => item.id !== nextProject.id)];
-      persistLocalProjects(next);
-      return next;
+  function updateBrief<K extends keyof StoryBrief>(key: K, value: StoryBrief[K]) {
+    setBrief((current) => ({ ...current, [key]: value }));
+    setStatus("任务已改变，请重新生成路线");
+  }
+
+  async function handleSourceFile(file: File) {
+    if (file.size > MAX_SOURCE_FILE_BYTES) {
+      setStatus("文件超过 10MB，请拆分后再导入");
+      return;
+    }
+    const extension = file.name.toLowerCase().split(".").pop();
+    if (!["txt", "md", "docx"].includes(extension ?? "")) {
+      setStatus("请选择 TXT、Markdown 或 DOCX 文件");
+      return;
+    }
+    setIsReadingFile(true);
+    try {
+      const text =
+        extension === "docx"
+          ? (await import("mammoth")).extractRawText({ arrayBuffer: await file.arrayBuffer() })
+          : { value: await file.text() };
+      const value = (await text).value;
+      updateBrief("sourceText", value);
+      updateBrief("title", file.name.replace(/\.(txt|md|docx)$/i, ""));
+      setStatus(`已读取 ${file.name}`);
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "文件读取失败");
+    } finally {
+      setIsReadingFile(false);
+    }
+  }
+
+  function generateRoutes() {
+    const normalized = normalizeStoryBrief(brief);
+    const nextCandidates = generateStoryCandidates(normalized, memory);
+    setBrief(normalized);
+    setCandidates(nextCandidates);
+    setSelectedId(null);
+    setDelivery(null);
+    setStatus(memory ? `第 ${memory.round} 轮路线已按反馈重排` : "四条路线已生成，请比较收益与代价");
+    saveStudio({
+      brief: normalized,
+      candidates: nextCandidates,
+      selectedId: null,
+      delivery: null,
+      memory,
     });
   }
 
-  function loadSample() {
-    setTitle(SAMPLE_TITLE);
-    setSourceText(SAMPLE_SOURCE_TEXT);
-    setProject(null);
-    setSteps(createInitialSteps());
-    setActiveTab("structure");
-    setMessage("示例已载入");
+  function selectCandidate(candidateId: string) {
+    setSelectedId(candidateId);
+    setStatus("路线已选择，确认后生成可编辑交付稿");
+    saveStudio({ brief, candidates, selectedId: candidateId, delivery, memory });
   }
 
-  function updateCreativeBrief<K extends keyof CreativeBrief>(key: K, value: CreativeBrief[K]) {
-    setCreativeBrief((current) => ({ ...current, [key]: value }));
-    setProject(null);
-    setSteps(createInitialSteps());
-    setMessage("改编任务已更新，请重新整理草案");
+  function confirmCandidate() {
+    if (!selectedCandidate) return;
+    const nextDelivery = buildStoryDelivery(brief, selectedCandidate);
+    setDelivery(nextDelivery);
+    setStatus("路线已确认，交付稿可以编辑和下载");
+    saveStudio({ brief, candidates, selectedId, delivery: nextDelivery, memory });
   }
 
-  async function handleFile(file: File) {
-    if (file.size > MAX_SOURCE_FILE_BYTES) {
-      setMessage("文件超过 10MB，请拆分后再导入");
+  function updateDelivery(nextDelivery: StoryDelivery) {
+    setDelivery(nextDelivery);
+    saveStudio({ brief, candidates, selectedId, delivery: nextDelivery, memory });
+  }
+
+  function downloadDelivery(kind: "markdown" | "json") {
+    if (!delivery) return;
+    const files = buildStoryDownloads(delivery);
+    const base = safeFilename(brief.title);
+    if (kind === "markdown") {
+      downloadFile(`${base}-第${delivery.version}版.md`, files.markdown, "text/markdown");
+      setStatus("Markdown 交付稿已开始下载");
       return;
     }
-
-    const extension = file.name.toLowerCase().split(".").pop();
-    if (!["txt", "md", "docx"].includes(extension ?? "")) {
-      setMessage("请选择 TXT、Markdown 或 DOCX 文件");
-      return;
-    }
-
-    setIsUploading(true);
-    setMessage("正在读取原著");
-    try {
-      let text = "";
-      if (extension === "docx") {
-        const mammoth = await import("mammoth");
-        const result = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() });
-        text = result.value;
-        if (!text.trim()) throw new Error("DOCX 中没有可读取的文本");
-      } else {
-        text = await file.text();
-      }
-
-      setSourceText(text);
-      if (!title.trim() || title === SAMPLE_TITLE) {
-        setTitle(file.name.replace(/\.(txt|md|docx)$/i, ""));
-      }
-      setProject(null);
-      setSteps(createInitialSteps());
-      setMessage(`已导入 ${file.name}`);
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "文件读取失败");
-    } finally {
-      setIsUploading(false);
-    }
+    downloadFile(`${base}-第${delivery.version}版.json`, files.json, "application/json");
+    setStatus("JSON 交付稿已开始下载");
   }
 
-  function createStructureDraft() {
-    if (!canRun) return;
-    setIsRunning(true);
-    const localProject = createLocalDraftProject(title, sourceText, creativeBrief);
-    mergeProject(localProject);
-    setSteps(localProject.steps);
-    setActiveTab("structure");
-    setMessage("结构草案已生成");
-    setIsRunning(false);
-  }
-
-  function exportProject(format: ExportFormat) {
-    if (!project?.results) return;
-    if (isLocalProject(project)) {
-      exportLocalProject(project, format);
-      return;
-    }
-    window.location.assign(`/api/projects/${project.id}/export?format=${format}`);
-  }
-
-  function loadProject(item: Project) {
-    setProject(item);
-    setTitle(item.title);
-    setSourceText(item.sourceText);
-    setSteps(item.steps);
-    setCreativeBrief(normalizeCreativeBrief(item.creativeBrief));
-    setActiveTab("structure");
-    setMessage(`已打开 ${item.title}`);
+  function submitFeedback() {
+    if (!delivery || !feedbackNote.trim()) return;
+    const result = applyStoryFeedback(delivery, {
+      score: feedbackScore,
+      issue: feedbackIssue,
+      note: feedbackNote,
+    });
+    const nextCandidates = generateStoryCandidates(brief, result.memory);
+    setDelivery(result.delivery);
+    setMemory(result.memory);
+    setCandidates(nextCandidates);
+    setSelectedId(null);
+    setFeedbackNote("");
+    setStatus("下一轮推荐已改变");
+    saveStudio({
+      brief,
+      candidates: nextCandidates,
+      selectedId: null,
+      delivery: result.delivery,
+      memory: result.memory,
+    });
   }
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[#f4f1ec] text-slate-900">
-      <AccountDialog
-        key={`${accountMode ?? "closed"}-${creativeBrief.creatorName}`}
-        mode={accountMode}
-        creatorName={creativeBrief.creatorName}
-        onClose={() => setAccountMode(null)}
-        onSave={(creatorName) => {
-          updateCreativeBrief("creatorName", creatorName.trim() || DEFAULT_CREATIVE_BRIEF.creatorName);
-          setAccountMode(null);
-          setMessage(`主创已更新为 ${creatorName.trim() || DEFAULT_CREATIVE_BRIEF.creatorName}`);
-        }}
-      />
-
-      <header className="sticky top-0 z-40 border-b border-white/10 bg-[#121116]/95 text-white backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-[1600px] items-center gap-5 px-4 sm:px-6">
-          <div className="flex shrink-0 items-center gap-3">
-            <div className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 shadow-lg shadow-violet-950/30">
-              <Wand2 className="h-4.5 w-4.5" aria-hidden="true" />
-            </div>
-            <div>
-              <div className="text-sm font-semibold tracking-wide">创剧AI</div>
-              <div className="hidden text-[10px] uppercase tracking-[0.22em] text-white/40 sm:block">
-                pre-production studio
-              </div>
-            </div>
-          </div>
-
-          <nav aria-label="主导航" className="hidden flex-1 items-center gap-1 md:flex">
-            <a className="rounded-lg px-3 py-2 text-xs text-white/70 hover:bg-white/10 hover:text-white" href="#workbench">
-              改编台
+    <main className="studio-shell min-h-[100dvh] overflow-x-hidden bg-[var(--paper-50)] text-[var(--ink-950)]">
+      <header className="studio-header sticky top-0 z-40 border-b border-white/10 bg-[color:var(--ink-950)]/96 text-white backdrop-blur-xl">
+        <div className="mx-auto flex min-h-16 max-w-[1500px] items-center gap-3 px-4 py-2 sm:px-6">
+          <a className="flex min-h-11 min-w-0 items-center gap-3" href="#top" aria-label="创剧 AI 首页">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[var(--paper-50)] text-[var(--ink-950)]">
+              <BrandMark className="h-8 w-8" decorative />
+            </span>
+            <span className="min-w-0">
+              <b className="block text-sm tracking-wide">创剧 AI</b>
+              <small className="hidden text-[10px] uppercase tracking-[0.2em] text-white/45 sm:block">
+                Story decision studio
+              </small>
+            </span>
+          </a>
+          <nav className="ml-5 hidden items-center gap-1 md:flex" aria-label="主导航">
+            <a className="inline-flex min-h-11 items-center px-3 text-xs text-white/65 hover:text-white" href="#brief">
+              写任务
             </a>
-            <a className="rounded-lg px-3 py-2 text-xs text-white/70 hover:bg-white/10 hover:text-white" href="#pipeline">
-              制作管线
+            <a className="inline-flex min-h-11 items-center px-3 text-xs text-white/65 hover:text-white" href="#candidates">
+              比路线
             </a>
-            <a className="rounded-lg px-3 py-2 text-xs text-white/70 hover:bg-white/10 hover:text-white" href="#production">
-              创作编辑器
-            </a>
-            <a className="rounded-lg px-3 py-2 text-xs text-white/70 hover:bg-white/10 hover:text-white" href="#projects">
-              项目
+            <a className="inline-flex min-h-11 items-center px-3 text-xs text-white/65 hover:text-white" href="#delivery">
+              做交付
             </a>
           </nav>
-
-          <div className="ml-auto flex items-center gap-2">
-            <a
-              className="hidden items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-[11px] text-white/60 hover:border-violet-300/40 hover:text-white lg:inline-flex"
-              href="#production"
-            >
-              <CircleDot className="h-3 w-3 text-amber-400" />
-              生成服务设置
-            </a>
-            <button
-              className="h-9 rounded-lg px-3 text-xs font-medium text-white/75 hover:bg-white/10 hover:text-white"
-              type="button"
-              onClick={() => setAccountMode("login")}
-            >
-              登录
-            </button>
-            <button
-              className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-white px-3 text-xs font-semibold text-slate-950 hover:bg-violet-50"
-              type="button"
-              onClick={() => setAccountMode("register")}
-            >
-              <UserPlus className="h-3.5 w-3.5" aria-hidden="true" />
-              注册
-            </button>
-          </div>
+          <span className="ml-auto max-w-[48vw] truncate rounded-full border border-white/10 px-3 py-2 text-[11px] text-white/65">
+            {status}
+          </span>
         </div>
       </header>
 
-      <section className="border-b border-slate-200/70 bg-[#121116] text-white">
-        <div className="mx-auto max-w-[1600px] px-4 py-10 sm:px-6 lg:py-14">
-          <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
-            <div>
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-violet-300/20 bg-violet-400/10 px-3 py-1 text-xs text-violet-200">
-                <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-                小说改剧 · 前期制片工作台
-              </div>
-              <h1 className="max-w-3xl text-3xl font-semibold tracking-[-0.035em] sm:text-4xl lg:text-5xl">
-                把原著变成可执行的短剧方案
-              </h1>
-              <p className="mt-4 max-w-2xl text-sm leading-7 text-white/55 sm:text-base">
-                从原文节点开始，逐步完成剧情结构、人物、场景、镜头与时序交付。
-              </p>
+      <section id="top" className="relative overflow-hidden bg-[var(--ink-950)] text-white">
+        <div className="absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(255,255,255,.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.05)_1px,transparent_1px)] [background-size:42px_42px]" />
+        <div className="relative mx-auto grid max-w-[1500px] gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.05fr_.95fr] lg:items-end lg:py-20">
+          <div>
+            <div className="inline-flex min-h-9 items-center gap-2 rounded-full border border-[var(--jade-400)]/30 bg-[var(--jade-400)]/10 px-3 text-xs text-[var(--jade-400)]">
+              <ShieldCheck className="h-4 w-4" aria-hidden="true" />
+              原文证据 · 选择理由 · 制作代价
             </div>
-            <div className="flex max-w-full items-center gap-1 overflow-x-auto pb-1">
-              {productionStages.map((stage, index) => (
-                <div key={stage} className="flex shrink-0 items-center">
-                  <span
-                    className={`rounded-full px-3 py-1.5 text-[11px] ${
-                      index === 0 ? "bg-white text-slate-950" : "border border-white/10 text-white/55"
-                    }`}
-                  >
-                    {stage}
-                  </span>
-                  {index < productionStages.length - 1 ? (
-                    <ChevronRight className="mx-1 h-3.5 w-3.5 text-white/20" aria-hidden="true" />
-                  ) : null}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <div id="workbench" className="mx-auto grid max-w-[1600px] gap-5 px-4 py-6 sm:px-6 xl:grid-cols-[minmax(360px,0.78fr)_minmax(0,1.22fr)]">
-        <section className="self-start overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-[0_18px_60px_rgba(15,23,42,0.06)] xl:sticky xl:top-22">
-          <div className="border-b border-slate-100 p-5">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <div className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-600">Source</div>
-                <h2 className="mt-1 text-lg font-semibold text-slate-950">导入原著</h2>
-              </div>
-              <button
-                className="h-9 rounded-xl border border-slate-200 px-3 text-xs font-medium text-slate-600 hover:border-violet-300 hover:text-violet-700"
-                type="button"
-                onClick={loadSample}
-              >
-                载入示例
-              </button>
-            </div>
-          </div>
-
-          <div className="space-y-4 p-5">
-            <section className="rounded-2xl bg-slate-950 p-4 text-white" aria-labelledby="creative-brief-title">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <h3 id="creative-brief-title" className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-300">
-                  改编任务
-                </h3>
-                <span className="rounded-full bg-white/10 px-2.5 py-1 text-[11px] text-white/65">
-                  {creativeBrief.deliveryTime} 交付
-                </span>
-              </div>
-              <p className="mt-3 text-sm font-medium">
-                {creativeBrief.creatorName}要把原著压进 {creativeBrief.episodeMinutes} 分钟
-              </p>
-              <p className="mt-2 text-xs leading-6 text-white/55">
-                面向{creativeBrief.targetAudience}观众，本轮选择“{creativeBrief.priority}”：
-                {priorityChoices[creativeBrief.priority]}
-              </p>
-            </section>
-
-            <label className="block">
-              <span className="mb-2 block text-xs font-medium text-slate-600">项目名称</span>
-              <input
-                aria-label="项目名称"
-                className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm outline-none transition focus:border-violet-400 focus:bg-white focus:ring-4 focus:ring-violet-100"
-                placeholder="输入项目名称"
-                value={title}
-                onChange={(event) => setTitle(event.target.value)}
-              />
-            </label>
-
-            <fieldset className="grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:grid-cols-2">
-              <legend className="px-1 text-xs font-semibold text-slate-700">谁在何时做什么取舍</legend>
-              <label className="block text-xs font-medium text-slate-600">
-                主创称呼
-                <input
-                  aria-label="主创称呼"
-                  className="mt-2 h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm focus:border-violet-400"
-                  maxLength={24}
-                  value={creativeBrief.creatorName}
-                  onChange={(event) => updateCreativeBrief("creatorName", event.target.value)}
-                />
-              </label>
-              <label className="block text-xs font-medium text-slate-600">
-                我的角色
-                <select
-                  aria-label="我的角色"
-                  className="mt-2 h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm focus:border-violet-400"
-                  value={creativeBrief.creatorRole}
-                  onChange={(event) => updateCreativeBrief("creatorRole", event.target.value as CreativeBrief["creatorRole"])}
-                >
-                  <option>编剧</option>
-                  <option>制片统筹</option>
-                  <option>IP责编</option>
-                </select>
-              </label>
-              <label className="block text-xs font-medium text-slate-600">
-                目标观众
-                <select
-                  aria-label="目标观众"
-                  className="mt-2 h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm focus:border-violet-400"
-                  value={creativeBrief.targetAudience}
-                  onChange={(event) => updateCreativeBrief("targetAudience", event.target.value as CreativeBrief["targetAudience"])}
-                >
-                  <option>悬疑追更</option>
-                  <option>情感共鸣</option>
-                  <option>轻喜反转</option>
-                </select>
-              </label>
-              <label className="block text-xs font-medium text-slate-600">
-                本轮优先
-                <select
-                  aria-label="本轮优先"
-                  className="mt-2 h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm focus:border-violet-400"
-                  value={creativeBrief.priority}
-                  onChange={(event) => updateCreativeBrief("priority", event.target.value as CreativeBrief["priority"])}
-                >
-                  <option>人物情感</option>
-                  <option>悬念节奏</option>
-                  <option>低成本拍摄</option>
-                </select>
-              </label>
-              <label className="block text-xs font-medium text-slate-600">
-                单集时长
-                <select
-                  aria-label="单集时长"
-                  className="mt-2 h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm focus:border-violet-400"
-                  value={creativeBrief.episodeMinutes}
-                  onChange={(event) => updateCreativeBrief("episodeMinutes", Number(event.target.value) as EpisodeMinutes)}
-                >
-                  <option value="1">1 分钟</option>
-                  <option value="3">3 分钟</option>
-                  <option value="5">5 分钟</option>
-                </select>
-              </label>
-              <label className="block text-xs font-medium text-slate-600">
-                交付时间
-                <input
-                  aria-label="交付时间"
-                  className="mt-2 h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm focus:border-violet-400"
-                  maxLength={32}
-                  value={creativeBrief.deliveryTime}
-                  onChange={(event) => updateCreativeBrief("deliveryTime", event.target.value)}
-                />
-              </label>
-            </fieldset>
-
-            <label
-              className="group flex min-h-28 cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-center transition hover:border-violet-400 hover:bg-violet-50/50"
-              onDragOver={(event) => event.preventDefault()}
-              onDrop={(event) => {
-                event.preventDefault();
-                const file = event.dataTransfer.files?.[0];
-                if (file) void handleFile(file);
-              }}
+            <h1 className="mt-6 max-w-4xl text-4xl font-semibold leading-[1.08] tracking-[-0.05em] sm:text-5xl lg:text-7xl">
+              让每个改编选择，
+              <span className="text-[var(--persimmon-500)]">都有原文依据。</span>
+            </h1>
+            <p className="mt-6 max-w-2xl text-sm leading-8 text-white/58 sm:text-base">
+              写下故事任务，比较四条真正不同的路线。你会先看见每条路线保留什么、牺牲什么，再确认一份可以编辑、下载并持续复盘的交付稿。
+            </p>
+            <a
+              className="mt-8 inline-flex min-h-12 items-center gap-3 rounded-xl bg-[var(--persimmon-500)] px-5 text-sm font-semibold text-white hover:bg-[var(--persimmon-600)]"
+              href="#brief"
             >
-              {isUploading ? (
-                <Loader2 className="h-6 w-6 animate-spin text-violet-600" aria-hidden="true" />
-              ) : (
-                <Upload className="h-6 w-6 text-slate-400 group-hover:text-violet-600" aria-hidden="true" />
-              )}
-              <span className="mt-2 text-xs font-semibold text-slate-700">
-                {isUploading ? "正在读取" : "拖入原著或点击选择"}
-              </span>
-              <span className="mt-1 text-[11px] text-slate-400">TXT · Markdown · DOCX，最大 10MB</span>
-              <input
-                className="sr-only"
-                type="file"
-                accept=".txt,.md,.docx"
-                onChange={(event) => {
-                  const file = event.target.files?.[0];
-                  if (file) void handleFile(file);
-                  event.currentTarget.value = "";
-                }}
-              />
-            </label>
-
-            <label className="block">
-              <span className="mb-2 flex items-center justify-between text-xs font-medium text-slate-600">
-                <span>原著内容</span>
-                <span className="font-mono text-[11px] text-slate-400">
-                  {sourceText.trim().length.toLocaleString()} 字
-                </span>
-              </span>
-              <textarea
-                className="min-h-72 w-full resize-y rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm leading-7 outline-none transition focus:border-violet-400 focus:bg-white focus:ring-4 focus:ring-violet-100"
-                placeholder="粘贴小说文本内容..."
-                value={sourceText}
-                onChange={(event) => {
-                  setSourceText(event.target.value);
-                  setProject(null);
-                  setSteps(createInitialSteps());
-                }}
-              />
-            </label>
-
-            <div className="grid gap-2 sm:grid-cols-2">
-              <button
-                className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-slate-950 px-4 text-sm font-semibold text-white transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
-                type="button"
-                disabled={!canRun}
-                onClick={createStructureDraft}
-              >
-                {isRunning ? (
-                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                ) : (
-                  <Layers3 className="h-4 w-4" aria-hidden="true" />
-                )}
-                整理结构草案
-              </button>
-              <a
-                className={`inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-violet-200 bg-violet-50 px-4 text-sm font-semibold text-violet-700 transition hover:bg-violet-100 ${
-                  project ? "" : "pointer-events-none border-slate-200 bg-slate-50 text-slate-400"
-                }`}
-                aria-disabled={!project}
-                href="#production"
-              >
-                <Sparkles className="h-4 w-4" aria-hidden="true" />
-                继续创作
-              </a>
-            </div>
-            <div aria-live="polite" className="flex items-center gap-2 text-xs text-slate-500">
-              <CircleDot className="h-3.5 w-3.5 text-violet-500" aria-hidden="true" />
-              {message}
-            </div>
-          </div>
-        </section>
-
-        <section className="min-w-0 overflow-hidden rounded-3xl border border-slate-200/80 bg-[#fbfbfc] shadow-[0_18px_60px_rgba(15,23,42,0.06)]">
-          <div className="border-b border-slate-200 bg-white p-4 sm:p-5">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <div className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-600">Workspace</div>
-                <h2 className="mt-1 text-lg font-semibold text-slate-950">改编成果</h2>
-              </div>
-              <div className="flex items-center gap-2">
-                {(["md", "json", "csv"] as const).map((format) => (
-                  <button
-                    key={format}
-                    className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-xs font-medium text-slate-600 hover:border-violet-300 hover:text-violet-700 disabled:cursor-not-allowed disabled:opacity-40"
-                    type="button"
-                    disabled={!project?.results}
-                    onClick={() => exportProject(format)}
-                  >
-                    <Download className="h-3.5 w-3.5" aria-hidden="true" />
-                    {format.toUpperCase()}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="mt-4 overflow-x-auto">
-              <div className="flex min-w-max gap-1">
-                {resultTabs.map((tab) => (
-                  <button
-                    key={tab.id}
-                    className={`rounded-xl px-3 py-2 text-xs font-medium transition ${
-                      activeTab === tab.id
-                        ? "bg-slate-950 text-white"
-                        : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
-                    }`}
-                    type="button"
-                    onClick={() => setActiveTab(tab.id)}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
-              </div>
-            </div>
+              带着故事进去
+              <ArrowDownRight className="h-4 w-4" aria-hidden="true" />
+            </a>
           </div>
 
-          <div className="p-4 sm:p-5">
-            {activeTab === "structure" ? <StructureView project={project} /> : null}
-            {activeTab === "characters" ? <CharacterView characters={results?.characters} /> : null}
-            {activeTab === "scenes" ? <SceneView scenes={results?.scenes} /> : null}
-            {activeTab === "shots" ? <ShotsView shots={results?.shots} /> : null}
-            {activeTab === "timeline" ? (
-              <TimelineView items={results?.timeline.items} total={results?.timeline.totalDurationSeconds} />
-            ) : null}
-          </div>
-        </section>
-      </div>
-
-      <ProductionWorkspace
-        project={project}
-        onProjectChange={(nextProject) => {
-          mergeProject(nextProject);
-          setSteps(nextProject.steps);
-        }}
-      />
-
-      <section id="pipeline" className="mx-auto max-w-[1600px] px-4 pb-6 sm:px-6">
-        <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white">
-          <div className="flex flex-wrap items-end justify-between gap-4 border-b border-slate-100 p-5">
-            <div>
-              <div className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-600">Pipeline</div>
-              <h2 className="mt-1 text-lg font-semibold text-slate-950">AI 制作管线</h2>
-              <p className="mt-2 text-xs leading-6 text-slate-500">
-                连接生成服务后，可按制作阶段生成、审阅并完善内容。
-              </p>
-            </div>
-            <div className="font-mono text-sm text-slate-400">{progress}%</div>
-          </div>
-          <div className="grid gap-px bg-slate-100 md:grid-cols-2 xl:grid-cols-7">
-            {steps.map((step, index) => (
-              <article key={step.id} className="min-h-36 bg-white p-4">
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-[11px] text-slate-400">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <Sparkles className="h-4 w-4 text-violet-300" aria-hidden="true" />
-                </div>
-                <h3 className="mt-6 text-sm font-semibold text-slate-900">{step.name}</h3>
-                <p className="mt-2 text-[11px] leading-5 text-slate-500">{step.description}</p>
-                <div className="mt-4 text-[11px] font-medium">
-                  <StepStatus step={step} />
-                </div>
+          <div className="grid min-w-0 gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
+            {[
+              ["01", "写下约束", "类型、受众、时长与制作限制一起进入判断"],
+              ["02", "比较取舍", "候选顺序与理由随你的任务真实改变"],
+              ["03", "反馈回流", "一次观察会改变下一轮推荐"],
+            ].map(([number, title, copy]) => (
+              <article key={number} className="rounded-2xl border border-white/10 bg-white/[0.045] p-4">
+                <span className="font-mono text-xs text-[var(--jade-400)]">{number}</span>
+                <h2 className="mt-5 text-sm font-semibold">{title}</h2>
+                <p className="mt-2 text-xs leading-6 text-white/45">{copy}</p>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      {projects.length ? (
-        <section id="projects" className="mx-auto max-w-[1600px] px-4 pb-12 sm:px-6">
-          <div className="mb-4 flex items-center gap-2">
-            <FolderOpen className="h-4 w-4 text-violet-600" aria-hidden="true" />
-            <h2 className="text-sm font-semibold text-slate-900">最近项目</h2>
+      <section id="brief" className="mx-auto max-w-[1500px] scroll-mt-24 px-4 py-10 sm:px-6 lg:py-14">
+        <div className="grid min-w-0 gap-6 xl:grid-cols-[.68fr_1.32fr]">
+          <div className="self-start xl:sticky xl:top-24">
+            <div className="font-mono text-xs uppercase tracking-[0.2em] text-[var(--persimmon-600)]">
+              01 / Story brief
+            </div>
+            <h2 className="mt-4 text-3xl font-semibold tracking-tight">先说清，这一次为什么成立。</h2>
+            <p className="mt-4 max-w-lg text-sm leading-7 text-black/58">
+              每个字段都会进入评分、排序、结构或制作计划。改一个属性，候选结果就要给出新的因果解释。
+            </p>
+            <div className="mt-6 rounded-2xl border border-black/10 bg-white p-4 text-xs leading-6 text-black/55">
+              <div className="flex items-center gap-2 font-semibold text-[var(--ink-950)]">
+                <ShieldCheck className="h-4 w-4 text-[var(--jade-400)]" aria-hidden="true" />
+                无账号门槛
+              </div>
+              <p className="mt-2">核心判断在浏览器内完成，输入、选择和反馈默认只保存在本机。</p>
+            </div>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {projects.slice(0, 8).map((item) => (
+
+          <form
+            className="min-w-0 rounded-[2rem] border border-black/10 bg-white p-4 shadow-[0_24px_80px_rgba(23,19,28,.07)] sm:p-6"
+            onSubmit={(event) => {
+              event.preventDefault();
+              generateRoutes();
+            }}
+          >
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <label className="block min-w-0 text-xs font-medium text-black/60">
+                主创称呼
+                <input
+                  aria-label="主创称呼"
+                  className={fieldClass}
+                  maxLength={24}
+                  value={brief.creator}
+                  onChange={(event) => updateBrief("creator", event.target.value)}
+                />
+              </label>
+              <label className="block min-w-0 text-xs font-medium text-black/60 sm:col-span-1 lg:col-span-2">
+                项目名称
+                <input
+                  aria-label="项目名称"
+                  className={fieldClass}
+                  maxLength={48}
+                  value={brief.title}
+                  onChange={(event) => updateBrief("title", event.target.value)}
+                />
+              </label>
+              <SelectField
+                label="故事类型"
+                value={brief.genre}
+                options={["悬疑", "都市情感", "轻喜"].map((value) => ({ value, label: value }))}
+                onChange={(value) => updateBrief("genre", value as StoryGenre)}
+              />
+              <SelectField
+                label="目标观众"
+                value={brief.audience}
+                options={["追更观众", "情感共鸣", "家庭共看"].map((value) => ({ value, label: value }))}
+                onChange={(value) => updateBrief("audience", value as StoryAudience)}
+              />
+              <SelectField
+                label="单集时长"
+                value={brief.minutes}
+                options={[1, 3, 5].map((value) => ({ value, label: `${value} 分钟` }))}
+                onChange={(value) => updateBrief("minutes", Number(value) as StoryMinutes)}
+              />
+              <SelectField
+                label="叙事节奏"
+                value={brief.pace}
+                options={["高密推进", "层层递进", "留白呼吸"].map((value) => ({ value, label: value }))}
+                onChange={(value) => updateBrief("pace", value as StoryPace)}
+              />
+              <SelectField
+                label="情绪底色"
+                value={brief.mood}
+                options={["冷峻", "温暖", "荒诞"].map((value) => ({ value, label: value }))}
+                onChange={(value) => updateBrief("mood", value as StoryMood)}
+              />
+              <SelectField
+                label="叙事视角"
+                value={brief.pov}
+                options={["第一人称", "贴身第三人称", "群像视角"].map((value) => ({ value, label: value }))}
+                onChange={(value) => updateBrief("pov", value as StoryPov)}
+              />
+              <SelectField
+                label="改编重点"
+                value={brief.priority}
+                options={["悬念钩子", "人物关系", "制作可行"].map((value) => ({ value, label: value }))}
+                onChange={(value) => updateBrief("priority", value as StoryPriority)}
+              />
+              <SelectField
+                label="制作限制"
+                value={brief.constraint}
+                options={["单一地点", "少场景", "弹性制作"].map((value) => ({ value, label: value }))}
+                onChange={(value) => updateBrief("constraint", value as StoryConstraint)}
+              />
+            </div>
+
+            <div className="mt-5 grid min-w-0 gap-4 lg:grid-cols-[1fr_auto]">
+              <label className="block min-w-0 text-xs font-medium text-black/60">
+                原文片段
+                <textarea
+                  aria-label="原文片段"
+                  className={`${fieldClass} min-h-52 resize-y py-3 leading-7`}
+                  maxLength={4800}
+                  value={brief.sourceText}
+                  onChange={(event) => updateBrief("sourceText", event.target.value)}
+                />
+                <span className="mt-2 block text-right font-mono text-[11px] text-black/35">
+                  {brief.sourceText.length} / 4800
+                </span>
+              </label>
+              <label className="flex min-h-28 cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-black/15 bg-[var(--paper-50)] p-4 text-center text-xs text-black/55 transition hover:border-[var(--persimmon-500)] lg:mt-7 lg:w-48">
+                <FolderInput className="h-5 w-5 text-[var(--persimmon-600)]" aria-hidden="true" />
+                <span className="mt-2 font-semibold text-[var(--ink-950)]">
+                  {isReadingFile ? "正在读取" : "上传原文文件"}
+                </span>
+                <span className="mt-1 text-[10px]">TXT · MD · DOCX</span>
+                <input
+                  className="sr-only"
+                  type="file"
+                  accept=".txt,.md,.docx"
+                  onChange={(event) => {
+                    const file = event.currentTarget.files?.[0];
+                    if (file) void handleSourceFile(file);
+                    event.currentTarget.value = "";
+                  }}
+                />
+              </label>
+            </div>
+
+            <div className="mt-5 flex flex-col gap-3 border-t border-black/8 pt-5 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-xs leading-6 text-black/45">只引用当前原文，不请求外部内容。</p>
               <button
-                key={item.id}
-                aria-label={`打开 ${item.title}`}
-                className="group rounded-2xl border border-slate-200 bg-white p-4 text-left transition hover:-translate-y-0.5 hover:border-violet-300 hover:shadow-lg hover:shadow-violet-950/5"
-                type="button"
-                onClick={() => loadProject(item)}
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[var(--ink-950)] px-5 text-sm font-semibold text-white hover:bg-[var(--persimmon-600)] disabled:cursor-not-allowed disabled:opacity-40"
+                type="submit"
+                disabled={!brief.sourceText.trim()}
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="grid h-9 w-9 place-items-center rounded-xl bg-slate-100 text-slate-600 group-hover:bg-violet-100 group-hover:text-violet-700">
-                    <FileText className="h-4 w-4" aria-hidden="true" />
-                  </div>
-                  <span className="rounded-full bg-slate-50 px-2 py-1 text-[10px] text-slate-400">
-                    {isLocalProject(item) ? "结构草案" : item.status}
-                  </span>
-                </div>
-                <h3 className="mt-4 truncate text-sm font-semibold text-slate-900">{item.title}</h3>
-                <p className="mt-1 text-xs text-slate-400">
-                  {item.sourceText.length.toLocaleString()} 字 · {item.results?.shots.length ?? 0} 个节点
-                </p>
+                <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
+                生成创作路线
               </button>
-            ))}
+            </div>
+          </form>
+        </div>
+      </section>
+
+      {candidates.length ? (
+        <section id="candidates" className="scroll-mt-24 border-y border-black/8 bg-[#eee6d8]">
+          <div className="mx-auto max-w-[1500px] px-4 py-12 sm:px-6">
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+              <div>
+                <div className="font-mono text-xs uppercase tracking-[0.2em] text-[var(--persimmon-600)]">
+                  02 / Compare decisions
+                </div>
+                <h2 className="mt-4 text-3xl font-semibold tracking-tight">不是四个答案，是四种主动代价。</h2>
+                <p className="mt-3 max-w-3xl text-sm leading-7 text-black/55">
+                  当前任务为 {brief.genre} · {brief.audience} · {brief.minutes} 分钟；排序优先守住“{brief.priority}”，并遵守“{brief.constraint}”。
+                </p>
+              </div>
+              {memory ? (
+                <div className="inline-flex min-h-11 items-center gap-2 rounded-full bg-[var(--jade-400)]/18 px-4 text-xs font-semibold text-emerald-950">
+                  <RotateCcw className="h-4 w-4" aria-hidden="true" />
+                  第 {memory.round} 轮 · 上轮反馈已计入
+                </div>
+              ) : null}
+            </div>
+
+            <div className="mt-7 grid min-w-0 gap-4 lg:grid-cols-2">
+              {candidates.map((candidate) => (
+                <CandidateCard
+                  key={candidate.id}
+                  candidate={candidate}
+                  scene={scenesForCandidate(candidate.id, brief.mood, 1)[0]}
+                  selected={selectedId === candidate.id}
+                  onSelect={() => selectCandidate(candidate.id)}
+                />
+              ))}
+            </div>
+
+            <div className="mt-6 flex flex-col gap-3 rounded-2xl bg-[var(--ink-950)] p-4 text-white sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0">
+                <div className="text-[11px] text-white/45">当前选择</div>
+                <div className="mt-1 truncate text-sm font-semibold">
+                  {selectedCandidate ? `${selectedCandidate.title} · ${selectedCandidate.score} 分` : "请选择一条路线"}
+                </div>
+              </div>
+              <button
+                className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-[var(--persimmon-500)] px-5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
+                type="button"
+                disabled={!selectedCandidate}
+                onClick={confirmCandidate}
+              >
+                确认路线并生成交付
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </button>
+            </div>
           </div>
         </section>
       ) : null}
 
-      <div className="fixed inset-x-3 bottom-3 z-30 rounded-2xl border border-white/10 bg-slate-950/95 p-3 text-white shadow-2xl backdrop-blur md:hidden">
-        <div className="flex items-center gap-3">
-          <div className="min-w-0 flex-1">
-            <div className="truncate text-xs font-medium">{message}</div>
-            <div className="mt-2 h-1 overflow-hidden rounded-full bg-white/10">
-              <div className="h-full bg-violet-400 transition-all" style={{ width: `${progress}%` }} />
+      {delivery ? (
+        <section id="delivery" className="scroll-mt-24 bg-[var(--ink-950)] text-white">
+          <div className="mx-auto max-w-[1500px] px-4 py-12 sm:px-6">
+            <div className="grid min-w-0 gap-6 xl:grid-cols-[1.35fr_.65fr]">
+              <article className="min-w-0 rounded-[2rem] bg-[var(--paper-50)] p-4 text-[var(--ink-950)] sm:p-7">
+                <div className="flex flex-wrap items-start justify-between gap-4 border-b border-black/10 pb-5">
+                  <div>
+                    <div className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--persimmon-600)]">
+                      03 / Delivery · V{delivery.version}
+                    </div>
+                    <h2 className="mt-3 text-3xl font-semibold tracking-tight">可编辑交付稿</h2>
+                    <p className="mt-2 text-sm text-black/50">{delivery.decision.title}</p>
+                  </div>
+                  <span className="rounded-full bg-[var(--ink-950)] px-3 py-2 font-mono text-sm text-white">
+                    {delivery.decision.score}/100
+                  </span>
+                </div>
+
+                <section
+                  aria-label="路线分镜参照"
+                  className="mt-6 rounded-2xl border border-black/10 bg-white p-3 sm:p-4"
+                >
+                  <div className="flex flex-wrap items-end justify-between gap-2">
+                    <div>
+                      <div className="text-[11px] font-semibold text-[var(--persimmon-600)]">
+                        路线分镜参照
+                      </div>
+                      <p className="mt-1 text-xs leading-5 text-black/45">
+                        由“{delivery.decision.title}”与“{delivery.brief.mood}”共同选出，可直接对照节拍写作。
+                      </p>
+                    </div>
+                    <span className="font-mono text-[10px] text-black/35">5 SCENES</span>
+                  </div>
+                  <ol className="mt-3 grid min-w-0 grid-cols-2 gap-2 sm:grid-cols-5">
+                    {deliveryScenes.map((scene, index) => (
+                      <li className="min-w-0 overflow-hidden rounded-xl bg-[var(--ink-950)] text-white" key={scene.id}>
+                        <Image
+                          alt={scene.alt}
+                          className="aspect-[4/3] h-auto w-full object-cover"
+                          height={800}
+                          loading="lazy"
+                          quality={76}
+                          sizes="(max-width: 639px) 45vw, 18vw"
+                          src={scene.src}
+                          width={1280}
+                        />
+                        <div className="p-2">
+                          <div className="font-mono text-[9px] text-[var(--jade-400)]">
+                            {String(index + 1).padStart(2, "0")}
+                          </div>
+                          <p className="mt-1 text-[10px] leading-4 text-white/72">{scene.beat}</p>
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
+                </section>
+
+                <label className="mt-6 block text-xs font-semibold text-black/55">
+                  一句话故事
+                  <textarea
+                    aria-label="一句话故事"
+                    className={`${fieldClass} min-h-28 resize-y py-3 text-base leading-7`}
+                    value={delivery.logline}
+                    onChange={(event) => updateDelivery({ ...delivery, logline: event.target.value })}
+                  />
+                </label>
+
+                <ol className="mt-7 space-y-3">
+                  {delivery.sections.map((section, index) => (
+                    <li key={section.id} className="grid min-w-0 gap-3 rounded-2xl border border-black/10 bg-white p-4 sm:grid-cols-[88px_1fr]">
+                      <div>
+                        <div className="font-mono text-[11px] text-[var(--persimmon-600)]">
+                          {section.startSeconds}s–{section.endSeconds}s
+                        </div>
+                        <div className="mt-2 text-xs font-semibold">{section.name}</div>
+                      </div>
+                      <div className="min-w-0">
+                        <textarea
+                          aria-label={`${section.name}内容`}
+                          className="min-h-24 w-full resize-y rounded-xl border border-black/10 bg-[var(--paper-50)] p-3 text-xs leading-6 outline-none focus:border-[var(--persimmon-500)]"
+                          value={section.purpose}
+                          onChange={(event) => {
+                            const sections = delivery.sections.map((item, sectionIndex) =>
+                              sectionIndex === index ? { ...item, purpose: event.target.value } : item,
+                            );
+                            updateDelivery({ ...delivery, sections });
+                          }}
+                        />
+                        <p className="mt-2 text-[11px] leading-5 text-emerald-800">
+                          原文锚点：{section.sourceAnchor}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              </article>
+
+              <aside className="min-w-0 space-y-4">
+                <div className="rounded-2xl border border-white/10 bg-white/[0.045] p-5">
+                  <div className="text-[11px] font-semibold text-[var(--jade-400)]">选择理由</div>
+                  <p className="mt-3 text-xs leading-7 text-white/62">{delivery.decision.reason}</p>
+                </div>
+                <div className="rounded-2xl border border-orange-300/15 bg-orange-400/8 p-5">
+                  <div className="text-[11px] font-semibold text-orange-300">这版主动接受的代价</div>
+                  <p className="mt-3 text-xs leading-7 text-white/65">{delivery.decision.tradeoff}</p>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-white/[0.045] p-5">
+                  <div className="text-[11px] font-semibold text-white/45">制作计划</div>
+                  <p className="mt-3 text-xs leading-7 text-white/62">{delivery.productionPlan}</p>
+                  <p className="mt-3 border-t border-white/10 pt-3 text-xs leading-7 text-white/62">
+                    {delivery.visualDirection}
+                  </p>
+                </div>
+                <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-1">
+                  <button
+                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-white px-4 text-sm font-semibold text-[var(--ink-950)]"
+                    type="button"
+                    onClick={() => downloadDelivery("markdown")}
+                  >
+                    <Download className="h-4 w-4" aria-hidden="true" />
+                    下载 Markdown
+                  </button>
+                  <button
+                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/15 px-4 text-sm font-semibold text-white"
+                    type="button"
+                    onClick={() => downloadDelivery("json")}
+                  >
+                    <FileText className="h-4 w-4" aria-hidden="true" />
+                    下载 JSON
+                  </button>
+                </div>
+              </aside>
+            </div>
+
+            <div className="mt-8 grid min-w-0 gap-6 xl:grid-cols-[.8fr_1.2fr]">
+              <div>
+                <div className="font-mono text-xs uppercase tracking-[0.2em] text-[var(--jade-400)]">
+                  04 / Feedback loop
+                </div>
+                <h2 className="mt-4 text-3xl font-semibold tracking-tight">让一次观察，改变下一轮。</h2>
+                <p className="mt-4 max-w-xl text-sm leading-7 text-white/55">
+                  反馈不会只留在历史里。问题类型会直接改变候选权重，低分路线也会被主动降权。
+                </p>
+                {delivery.feedbackHistory.at(-1) ? (
+                  <div className="mt-5 rounded-2xl border border-[var(--jade-400)]/20 bg-[var(--jade-400)]/8 p-4">
+                    <div className="text-xs font-semibold text-[var(--jade-400)]">下一轮推荐已改变</div>
+                    <p className="mt-2 text-xs leading-6 text-white/60">
+                      {delivery.feedbackHistory.at(-1)?.action}
+                    </p>
+                  </div>
+                ) : null}
+              </div>
+
+              <form
+                className="min-w-0 rounded-[2rem] bg-white p-4 text-[var(--ink-950)] sm:p-6"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  submitFeedback();
+                }}
+              >
+                <fieldset>
+                  <legend className="text-xs font-semibold text-black/60">这条路线现在有多成立？</legend>
+                  <div className="mt-3 grid grid-cols-5 gap-2">
+                    {[1, 2, 3, 4, 5].map((score) => (
+                      <label key={score} className="relative grid min-h-11 cursor-pointer place-items-center rounded-xl border border-black/10 has-[:checked]:border-[var(--persimmon-500)] has-[:checked]:bg-orange-50">
+                        <input
+                          aria-label={`${score} 分`}
+                          className="absolute h-px w-px opacity-0"
+                          type="radio"
+                          name="feedback-score"
+                          value={score}
+                          checked={feedbackScore === score}
+                          onChange={() => setFeedbackScore(score)}
+                        />
+                        <span className="font-mono text-sm font-semibold">{score}</span>
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
+
+                <label className="mt-4 block text-xs font-medium text-black/60">
+                  最需要改变的地方
+                  <select
+                    aria-label="最需要改变的地方"
+                    className={fieldClass}
+                    value={feedbackIssue}
+                    onChange={(event) => setFeedbackIssue(event.target.value as FeedbackIssue)}
+                  >
+                    {[
+                      "钩子不够清楚",
+                      "人物动机偏弱",
+                      "节奏过满",
+                      "拍摄负担偏高",
+                      "可以继续",
+                    ].map((issue) => (
+                      <option key={issue}>{issue}</option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="mt-4 block text-xs font-medium text-black/60">
+                  观察记录
+                  <textarea
+                    aria-label="观察记录"
+                    className={`${fieldClass} min-h-28 resize-y py-3 leading-6`}
+                    maxLength={300}
+                    required
+                    placeholder="例如：试读者记住了信，却没有说出人物为什么返回剧院。"
+                    value={feedbackNote}
+                    onChange={(event) => setFeedbackNote(event.target.value)}
+                  />
+                </label>
+
+                <button
+                  className="mt-4 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--persimmon-500)] px-5 text-sm font-semibold text-white disabled:opacity-40"
+                  type="submit"
+                  disabled={!feedbackNote.trim()}
+                >
+                  <MessageSquareText className="h-4 w-4" aria-hidden="true" />
+                  保存反馈并进入下一轮
+                </button>
+              </form>
             </div>
           </div>
-          <button
-            className="inline-flex h-10 shrink-0 items-center gap-2 rounded-xl bg-white px-3 text-xs font-semibold text-slate-950 disabled:opacity-40"
-            type="button"
-            disabled={!canRun}
-            onClick={createStructureDraft}
-          >
-            <Play className="h-3.5 w-3.5" aria-hidden="true" />
-            整理草案
-          </button>
+        </section>
+      ) : null}
+
+      <footer className="studio-footer border-t border-black/10 bg-[var(--paper-50)]">
+        <div className="mx-auto flex max-w-[1500px] flex-col gap-4 px-4 py-8 sm:px-6 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-3">
+            <BrandMark className="h-9 w-9" decorative />
+            <div><b className="text-sm">创剧 AI</b><p className="text-xs text-black/45">让每次改编都有依据</p></div>
+          </div>
+          <p className="text-xs leading-6 text-black/45">本机保存 · 随时下载 · 反馈进入下一轮</p>
+          <a className="inline-flex min-h-11 items-center gap-2 text-xs font-semibold" href="#top">
+            回到开头 <ChevronRight className="h-4 w-4 -rotate-90" aria-hidden="true" />
+          </a>
         </div>
-      </div>
+      </footer>
+
+      {candidates.length && !delivery ? (
+        <div className="mobile-action fixed right-[max(.75rem,env(safe-area-inset-right))] bottom-[max(.75rem,env(safe-area-inset-bottom))] left-[max(.75rem,env(safe-area-inset-left))] z-30 rounded-2xl border border-white/10 bg-[var(--ink-950)]/96 p-3 text-white shadow-2xl backdrop-blur md:hidden">
+          <div className="flex items-center gap-3">
+            <div className="min-w-0 flex-1">
+              <div className="truncate text-xs font-semibold">
+                {selectedCandidate ? selectedCandidate.title : "选择一条路线继续"}
+              </div>
+              <p className="mt-1 truncate text-[10px] text-white/45">{status}</p>
+            </div>
+            <button
+              className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-xl bg-[var(--persimmon-500)] px-3 text-xs font-semibold disabled:opacity-40"
+              type="button"
+              disabled={!selectedCandidate}
+              onClick={confirmCandidate}
+            >
+              生成交付
+              <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+            </button>
+          </div>
+        </div>
+      ) : null}
+
+      <div className="sr-only" aria-live="polite">{status}</div>
     </main>
   );
 }

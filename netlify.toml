@@ -3,4 +3,4 @@ command = "npm run build"
 publish = ".next"
 
 [build.environment]
-NEXT_PUBLIC_BROWSER_DEMO = "1"
+NEXT_PUBLIC_OFFLINE_MODE = "1"

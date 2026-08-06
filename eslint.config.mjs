@@ -14,7 +14,7 @@ const eslintConfig = defineConfig([
     "output/**",
     "build/**",
     "next-env.d.ts",
-    // Local reference project outside this MVP.
+    // Local reference project outside this product.
     "OpenCut/**",
   ]),
 ]);
