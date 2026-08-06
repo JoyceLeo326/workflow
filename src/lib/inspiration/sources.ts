@@ -45,7 +45,7 @@ export const INSPIRATION_SOURCES: InspirationSource[] = [
     differentiation: [
       "Accepts TXT and DOCX source manuscripts without using a vector database or retrieval engine.",
       "Transforms source text into production-ready creative assets rather than search indexes.",
-      "Keeps a deterministic local fallback so demos work without paid API usage.",
+      "Keeps a deterministic local fallback so the core workflow works without paid API usage.",
     ],
   },
   {

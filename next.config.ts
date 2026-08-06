@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
-const browserDemoMode =
-  process.env.NEXT_PUBLIC_BROWSER_DEMO ?? (process.env.VERCEL === "1" ? "1" : undefined);
+const offlineMode =
+  process.env.NEXT_PUBLIC_OFFLINE_MODE ?? (process.env.VERCEL === "1" ? "1" : undefined);
 const providerOwnership = process.env.AI_PROVIDER_OWNERSHIP;
 const providerConnected =
   (providerOwnership === "user" || providerOwnership === "institution") &&
@@ -36,7 +36,7 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   env: {
-    NEXT_PUBLIC_BROWSER_DEMO: browserDemoMode ?? "0",
+    NEXT_PUBLIC_OFFLINE_MODE: offlineMode ?? "0",
     NEXT_PUBLIC_COST_MODE: "zero_owner_cost",
     NEXT_PUBLIC_PROVIDER_STATUS: providerStatus,
   },

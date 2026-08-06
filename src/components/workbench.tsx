@@ -13,16 +13,13 @@ import {
   FolderOpen,
   Layers3,
   Loader2,
-  LockKeyhole,
   Play,
   Sparkles,
   Upload,
-  UserPlus,
-  Wand2,
-  X,
   type LucideIcon,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { BrandMark } from "@/components/brand-mark";
 import { ProductionWorkspace } from "@/components/production-workspace";
 import { createInitialSteps } from "@/lib/workflow/agents";
 import {
@@ -49,9 +46,8 @@ import type {
 
 type ResultTab = "structure" | "characters" | "scenes" | "shots" | "timeline";
 type ExportFormat = "md" | "json" | "csv";
-type AccountMode = "login" | "register" | null;
 
-const IS_BROWSER_MODE = process.env.NEXT_PUBLIC_BROWSER_DEMO === "1";
+const IS_OFFLINE_MODE = process.env.NEXT_PUBLIC_OFFLINE_MODE === "1";
 const LOCAL_PROJECT_PREFIX = "local-";
 const LOCAL_PROJECTS_KEY = "chuangju.projects.v1";
 const MAX_SOURCE_FILE_BYTES = 10 * 1024 * 1024;
@@ -158,92 +154,6 @@ function exportLocalProject(project: Project, format: ExportFormat) {
     return;
   }
   downloadTextFile(`${baseName}.md`, "text/markdown", exportProjectAsMarkdown(project));
-}
-
-function AccountDialog({
-  mode,
-  creatorName,
-  onClose,
-  onSave,
-}: {
-  mode: AccountMode;
-  creatorName: string;
-  onClose: () => void;
-  onSave: (creatorName: string) => void;
-}) {
-  const [name, setName] = useState(creatorName);
-
-  useEffect(() => {
-    if (!mode) return;
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
-  }, [mode, onClose]);
-
-  if (!mode) return null;
-  const title = mode === "login" ? "登录创作空间" : "创建创作空间";
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="presentation">
-      <button
-        aria-label="关闭账号窗口"
-        className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"
-        type="button"
-        onClick={onClose}
-      />
-      <section
-        aria-labelledby="account-title"
-        aria-modal="true"
-        className="relative w-full max-w-md rounded-3xl border border-white/10 bg-white p-6 shadow-2xl"
-        role="dialog"
-      >
-        <button
-          aria-label="关闭"
-          className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full text-slate-500 hover:bg-slate-100"
-          type="button"
-          onClick={onClose}
-        >
-          <X className="h-4 w-4" aria-hidden="true" />
-        </button>
-        <div className="grid h-11 w-11 place-items-center rounded-2xl bg-violet-100 text-violet-700">
-          <LockKeyhole className="h-5 w-5" aria-hidden="true" />
-        </div>
-        <h2 id="account-title" className="mt-5 text-xl font-semibold text-slate-950">
-          {title}
-        </h2>
-        <p className="mt-2 text-sm leading-6 text-slate-600">
-          设置主创称呼，之后创建的任务、版本与导出文件会沿用这份署名。
-        </p>
-        <form
-          className="mt-5"
-          onSubmit={(event) => {
-            event.preventDefault();
-            onSave(name);
-          }}
-        >
-          <label className="block text-xs font-medium text-slate-600" htmlFor="account-creator-name">
-            主创称呼
-          </label>
-          <input
-            id="account-creator-name"
-            autoComplete="name"
-            className="mt-2 h-11 w-full rounded-xl border border-slate-200 px-3 text-sm focus:border-violet-400"
-            maxLength={24}
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-          />
-          <button
-            className="mt-4 h-11 w-full rounded-xl bg-slate-950 text-sm font-semibold text-white hover:bg-violet-700"
-            type="submit"
-          >
-            {mode === "login" ? "进入创作空间" : "创建创作空间"}
-          </button>
-        </form>
-      </section>
-    </div>
-  );
 }
 
 function EmptyPanel({
@@ -557,7 +467,6 @@ export function Workbench() {
   const [isRunning, setIsRunning] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [message, setMessage] = useState("导入原著，开始整理");
-  const [accountMode, setAccountMode] = useState<AccountMode>(null);
   const [creativeBrief, setCreativeBrief] = useState<CreativeBrief>({ ...DEFAULT_CREATIVE_BRIEF });
 
   const results = project?.results;
@@ -584,7 +493,7 @@ export function Workbench() {
       }
     });
 
-    if (IS_BROWSER_MODE) {
+    if (IS_OFFLINE_MODE) {
       return () => {
         cancelled = true;
       };
@@ -706,23 +615,11 @@ export function Workbench() {
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#f4f1ec] text-slate-900">
-      <AccountDialog
-        key={`${accountMode ?? "closed"}-${creativeBrief.creatorName}`}
-        mode={accountMode}
-        creatorName={creativeBrief.creatorName}
-        onClose={() => setAccountMode(null)}
-        onSave={(creatorName) => {
-          updateCreativeBrief("creatorName", creatorName.trim() || DEFAULT_CREATIVE_BRIEF.creatorName);
-          setAccountMode(null);
-          setMessage(`主创已更新为 ${creatorName.trim() || DEFAULT_CREATIVE_BRIEF.creatorName}`);
-        }}
-      />
-
       <header className="sticky top-0 z-40 border-b border-white/10 bg-[#121116]/95 text-white backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-[1600px] items-center gap-5 px-4 sm:px-6">
           <div className="flex shrink-0 items-center gap-3">
-            <div className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 shadow-lg shadow-violet-950/30">
-              <Wand2 className="h-4.5 w-4.5" aria-hidden="true" />
+            <div className="grid h-10 w-10 place-items-center rounded-xl bg-[#f6f0e4] text-[#17131c]">
+              <BrandMark className="h-8 w-8" decorative />
             </div>
             <div>
               <div className="text-sm font-semibold tracking-wide">创剧AI</div>
@@ -755,21 +652,9 @@ export function Workbench() {
               <CircleDot className="h-3 w-3 text-amber-400" />
               生成服务设置
             </a>
-            <button
-              className="h-9 rounded-lg px-3 text-xs font-medium text-white/75 hover:bg-white/10 hover:text-white"
-              type="button"
-              onClick={() => setAccountMode("login")}
-            >
-              登录
-            </button>
-            <button
-              className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-white px-3 text-xs font-semibold text-slate-950 hover:bg-violet-50"
-              type="button"
-              onClick={() => setAccountMode("register")}
-            >
-              <UserPlus className="h-3.5 w-3.5" aria-hidden="true" />
-              注册
-            </button>
+            <span className="rounded-full border border-white/10 px-3 py-2 text-[11px] text-white/65">
+              直接创作 · 本机保存
+            </span>
           </div>
         </div>
       </header>

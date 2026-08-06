@@ -41,7 +41,7 @@ function mockEmptyProjects() {
 }
 
 describe("Workbench", () => {
-  it("opens on the usable production desk with optional account actions and no implementation commentary", () => {
+  it("opens directly on the usable production desk without an account gate", () => {
     mockEmptyProjects();
 
     render(<Workbench />);
@@ -53,18 +53,16 @@ describe("Workbench", () => {
     expect(screen.getByRole("button", { name: "剧本结构" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "时序草案" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "载入示例" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "登录" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "注册" })).toBeInTheDocument();
+    expect(screen.getByText("直接创作 · 本机保存")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "整理结构草案" })).toBeDisabled();
 
     for (const internalCopy of [
       "零成本模式",
       "无自动扣费",
-      "MVP 完整度",
       "合规复刻矩阵",
       "移动端已适配",
       "本地 JSON 存储",
-      "本地规则演示，不是 AI 生成",
+      "本地规则冒充 AI 生成",
     ]) {
       expect(screen.queryByText(internalCopy)).not.toBeInTheDocument();
     }
@@ -209,18 +207,10 @@ describe("Workbench", () => {
     );
   });
 
-  it("supports keyboard activation for account and provider controls", async () => {
+  it("supports keyboard activation for provider controls", async () => {
     mockEmptyProjects();
     const user = userEvent.setup();
     render(<Workbench />);
-
-    const login = screen.getByRole("button", { name: "登录" });
-    login.focus();
-    await user.keyboard("{Enter}");
-    expect(screen.getByRole("dialog", { name: "登录创作空间" })).toBeInTheDocument();
-    expect(screen.queryByText(/尚未开放/)).not.toBeInTheDocument();
-    await user.keyboard("{Escape}");
-    expect(screen.queryByRole("dialog", { name: "登录创作空间" })).not.toBeInTheDocument();
 
     const provider = screen.getByRole("button", { name: /生成服务/ });
     provider.focus();
