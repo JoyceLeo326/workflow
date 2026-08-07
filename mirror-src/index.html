@@ -18,6 +18,7 @@
         <a href="#studio">开始创作</a>
         <a href="#delivery">交付稿</a>
         <a href="#review">复盘</a>
+        <a href="#atlas">镜头图谱</a>
       </nav>
       <span class="local-indicator"><i></i> 当前内容保存在本机</span>
     </header>
@@ -42,6 +43,10 @@
         <div class="story-stage" aria-label="故事路线预览">
           <div class="stage-light stage-light-a"></div>
           <div class="stage-light stage-light-b"></div>
+          <figure class="stage-visual">
+            <img src="./story-scenes/rain-theatre-letter.webp" alt="雨夜旧剧院后台，年轻人拆开密封信" width="960" height="640" fetchpriority="high" />
+            <figcaption><span>视觉起点 01</span><strong>雨先落下，信才被拆开。</strong></figcaption>
+          </figure>
           <article class="stage-card stage-card-back">
             <span>关系回声线</span><p>让秘密成为人物选择的代价。</p>
           </article>
@@ -105,6 +110,7 @@
         </header>
         <div class="delivery-layout">
           <article class="delivery-paper">
+            <figure class="delivery-visual"><img id="delivery-scene" src="./story-scenes/rain-theatre-letter.webp" alt="已确认路线的故事画面" width="960" height="640" /><figcaption><span id="delivery-scene-number">镜头 01</span><strong id="delivery-scene-caption">证据第一次出现</strong></figcaption></figure>
             <header><div><small>已确认路线</small><h3 id="delivery-route"></h3></div><span id="delivery-score"></span></header>
             <p class="logline" id="delivery-logline"></p>
             <ol class="episode-timeline" id="episode-timeline"></ol>
@@ -136,11 +142,24 @@
             <button class="button button-dark" type="submit">记录复盘并生成下一步</button>
           </form>
           <div class="revision-panel" aria-live="polite">
+            <figure class="review-visual"><img id="review-scene" src="./story-scenes/last-subway-reflection.webp" alt="复盘后的下一版故事画面" width="960" height="640" loading="lazy" /><figcaption id="review-scene-caption">反馈会把下一版推向另一帧。</figcaption></figure>
             <p class="empty-revision" id="revision-empty">第一条真实观察，会在这里变成明确的修订动作。</p>
             <div class="is-hidden" id="revision-result"><small id="revision-version"></small><h3>下一版只改这一件事</h3><p id="revision-action"></p><blockquote id="revision-evidence"></blockquote></div>
             <div class="review-history" id="review-history"></div>
           </div>
         </div>
+      </section>
+
+      <section class="atlas-section" id="atlas" aria-labelledby="atlas-title">
+        <header class="section-heading light-heading">
+          <span>05 / 镜头图谱</span>
+          <div><h2 id="atlas-title">二十四帧，不是装饰，是故事可以转向的证据。</h2><p>点一帧，把它放大。每张图都对应一个动作节点；路线、确认与复盘会从同一套视觉语法里取景。</p></div>
+        </header>
+        <div class="atlas-feature">
+          <figure><img id="atlas-feature-image" src="./story-scenes/rain-theatre-letter.webp" alt="雨夜剧院的信" width="960" height="640" loading="lazy" /></figure>
+          <div><span id="atlas-feature-number">SCENE 01 / 24</span><h3 id="atlas-feature-title">雨夜剧院的信</h3><p id="atlas-feature-beat">证据第一次出现</p></div>
+        </div>
+        <div class="atlas-grid" id="atlas-grid" role="list" aria-label="二十四帧故事镜头"></div>
       </section>
     </main>
 
