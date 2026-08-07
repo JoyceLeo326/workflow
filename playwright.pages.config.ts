@@ -8,6 +8,7 @@ const localOrigin = `http://127.0.0.1:${port}`;
 const origin = externalBaseUrl ? new URL(externalBaseUrl).origin : localOrigin;
 
 process.env.PLAYWRIGHT_ENTRY_PATH = basePath;
+process.env.PLAYWRIGHT_EXPECT_CSP = "1";
 
 export default defineConfig({
   testDir: "./e2e",

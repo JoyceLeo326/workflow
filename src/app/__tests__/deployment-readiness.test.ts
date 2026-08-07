@@ -39,12 +39,16 @@ describe("public deployment readiness", () => {
 
     const vercelConfig = JSON.parse(readFileSync(vercelConfigPath, "utf8")) as {
       $schema?: string;
-      framework?: string;
+      framework?: string | null;
+      buildCommand?: string;
+      outputDirectory?: string;
     };
 
     expect(vercelConfig).toMatchObject({
       $schema: "https://openapi.vercel.sh/vercel.json",
-      framework: "nextjs",
+      framework: null,
+      buildCommand: "npm run build",
+      outputDirectory: "out",
     });
 
     const previousVercel = process.env.VERCEL;
