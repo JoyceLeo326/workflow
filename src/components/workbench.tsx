@@ -9,6 +9,7 @@ import {
   FileText,
   FolderInput,
   MessageSquareText,
+  PackageOpen,
   RotateCcw,
   ShieldCheck,
   SlidersHorizontal,
@@ -36,6 +37,7 @@ import {
   type StoryPov,
   type StoryPriority,
 } from "@/lib/story-studio/engine";
+import { buildProductionPackageFiles } from "@/lib/story-studio/production-pack";
 import { scenesForCandidate, type StoryScene } from "@/lib/story-studio/scenes";
 
 const STORAGE_KEY = "chuangju.story-studio.v2";
@@ -65,7 +67,11 @@ function saveStudio(state: StoredStudio) {
 }
 
 function downloadFile(filename: string, content: string, contentType: string) {
-  const url = URL.createObjectURL(new Blob([content], { type: `${contentType};charset=utf-8` }));
+  downloadBlob(filename, new Blob([content], { type: `${contentType};charset=utf-8` }));
+}
+
+function downloadBlob(filename: string, blob: Blob) {
+  const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
   anchor.href = url;
   anchor.download = filename;
@@ -111,15 +117,16 @@ function SelectField({
 
 function CandidateCard({
   candidate,
-  scene,
+  scenes,
   selected,
   onSelect,
 }: {
   candidate: StoryCandidate;
-  scene: StoryScene;
+  scenes: StoryScene[];
   selected: boolean;
   onSelect: () => void;
 }) {
+  const [scene, ...supportingScenes] = scenes;
   return (
     <article
       className={`relative min-w-0 overflow-hidden rounded-[1.65rem] border p-5 transition ${
@@ -146,6 +153,29 @@ function CandidateCard({
           <span className="truncate">{scene.title}</span>
           <span className="shrink-0 text-[var(--jade-400)]">{scene.beat}</span>
         </div>
+        {supportingScenes.length ? (
+          <ol className="grid grid-cols-2 gap-px border-t border-white/10 bg-white/10">
+            {supportingScenes.slice(0, 2).map((supportingScene, index) => (
+              <li className="relative min-h-24 overflow-hidden bg-[var(--ink-950)]" key={supportingScene.id}>
+                <Image
+                  alt={supportingScene.alt}
+                  className="absolute inset-0 h-full w-full object-cover opacity-72"
+                  data-testid="candidate-scene"
+                  height={480}
+                  loading="lazy"
+                  quality={72}
+                  sizes="(max-width: 1023px) 50vw, 25vw"
+                  src={supportingScene.src}
+                  width={720}
+                />
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent px-3 pb-2 pt-8">
+                  <span className="font-mono text-[9px] text-[var(--jade-400)]">0{index + 2}</span>
+                  <p className="mt-1 line-clamp-2 text-[10px] leading-4 text-white/80">{supportingScene.beat}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        ) : null}
       </div>
       <div className="flex items-start justify-between gap-3">
         <div>
@@ -211,11 +241,12 @@ export function Workbench() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [delivery, setDelivery] = useState<StoryDelivery | null>(null);
   const [memory, setMemory] = useState<FeedbackMemory | undefined>();
-  const [status, setStatus] = useState("内容保存在当前浏览器");
+  const [status, setStatus] = useState("写下任务，开始比较创作路线");
   const [feedbackScore, setFeedbackScore] = useState(3);
   const [feedbackIssue, setFeedbackIssue] = useState<FeedbackIssue>("钩子不够清楚");
   const [feedbackNote, setFeedbackNote] = useState("");
   const [isReadingFile, setIsReadingFile] = useState(false);
+  const [isPacking, setIsPacking] = useState(false);
 
   const selectedCandidate = useMemo(
     () => candidates.find((candidate) => candidate.id === selectedId) ?? null,
@@ -228,6 +259,7 @@ export function Workbench() {
         : [],
     [delivery],
   );
+  const heroScenes = useMemo(() => scenesForCandidate("hook-first", brief.mood, 3), [brief.mood]);
 
   useEffect(() => {
     let cancelled = false;
@@ -339,6 +371,37 @@ export function Workbench() {
     setStatus("JSON 交付稿已开始下载");
   }
 
+  async function downloadProductionPackage() {
+    if (!delivery || isPacking) return;
+    setIsPacking(true);
+    setStatus("正在整理剧本、分镜与制作资料");
+    try {
+      const [{ default: JSZip }, files] = await Promise.all([
+        import("jszip"),
+        Promise.resolve(buildProductionPackageFiles(delivery, deliveryScenes)),
+      ]);
+      const zip = new JSZip();
+      zip.file("script.md", files.script);
+      zip.file("storyboard.csv", files.storyboardCsv);
+      zip.file("shot-list.csv", files.shotListCsv);
+      zip.file("production-plan.md", files.productionPlan);
+      zip.file("delivery.json", buildStoryDownloads(delivery).json);
+      zip.file("manifest.json", files.manifest);
+      for (const scene of deliveryScenes) {
+        const response = await fetch(scene.src);
+        if (!response.ok) throw new Error(`视觉素材读取失败：${scene.title}`);
+        zip.file(`visuals/${scene.src.split("/").at(-1)}`, await response.arrayBuffer());
+      }
+      const blob = await zip.generateAsync({ type: "blob", compression: "DEFLATE" });
+      downloadBlob(`${safeFilename(brief.title)}-制作包-V${delivery.version}.zip`, blob);
+      setStatus("制作包已下载：剧本、分镜、镜头表、执行单与视觉参考");
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "制作包整理失败，请重试");
+    } finally {
+      setIsPacking(false);
+    }
+  }
+
   function submitFeedback() {
     if (!delivery || !feedbackNote.trim()) return;
     const result = applyStoryFeedback(delivery, {
@@ -418,18 +481,35 @@ export function Workbench() {
             </a>
           </div>
 
-          <div className="grid min-w-0 gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
-            {[
-              ["01", "写下约束", "类型、受众、时长与制作限制一起进入判断"],
-              ["02", "比较取舍", "候选顺序与理由随你的任务真实改变"],
-              ["03", "反馈回流", "一次观察会改变下一轮推荐"],
-            ].map(([number, title, copy]) => (
-              <article key={number} className="rounded-2xl border border-white/10 bg-white/[0.045] p-4">
-                <span className="font-mono text-xs text-[var(--jade-400)]">{number}</span>
-                <h2 className="mt-5 text-sm font-semibold">{title}</h2>
-                <p className="mt-2 text-xs leading-6 text-white/45">{copy}</p>
-              </article>
-            ))}
+          <div className="min-w-0 rounded-[1.75rem] border border-white/10 bg-white/[0.045] p-3 shadow-2xl">
+            <div className="flex items-center justify-between gap-3 px-2 pb-3">
+              <div>
+                <span className="font-mono text-[10px] uppercase tracking-[.18em] text-[var(--jade-400)]">Story pulse</span>
+                <h2 className="mt-1 text-sm font-semibold">从证据到选择，再到可拍画面</h2>
+              </div>
+              <span className="rounded-full border border-white/10 px-2.5 py-1 text-[10px] text-white/50">{brief.mood}影调</span>
+            </div>
+            <ol className="grid grid-cols-3 gap-2">
+              {heroScenes.map((scene, index) => (
+                <li className="group relative min-h-52 overflow-hidden rounded-2xl sm:min-h-72 lg:min-h-56 xl:min-h-80" key={scene.id}>
+                  <Image
+                    alt={scene.alt}
+                    className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                    height={960}
+                    priority={index === 0}
+                    quality={78}
+                    sizes="(max-width: 1023px) 33vw, 16vw"
+                    src={scene.src}
+                    width={640}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/5 to-transparent" />
+                  <div className="absolute inset-x-0 bottom-0 p-3">
+                    <span className="font-mono text-[10px] text-[var(--jade-400)]">0{index + 1}</span>
+                    <p className="mt-1 text-[10px] leading-4 text-white/85 sm:text-xs sm:leading-5">{scene.beat}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
           </div>
         </div>
       </section>
@@ -447,9 +527,9 @@ export function Workbench() {
             <div className="mt-6 rounded-2xl border border-black/10 bg-white p-4 text-xs leading-6 text-black/55">
               <div className="flex items-center gap-2 font-semibold text-[var(--ink-950)]">
                 <ShieldCheck className="h-4 w-4 text-[var(--jade-400)]" aria-hidden="true" />
-                无账号门槛
+                当前创作焦点
               </div>
-              <p className="mt-2">核心判断在浏览器内完成，输入、选择和反馈默认只保存在本机。</p>
+              <p className="mt-2">{brief.genre} · {brief.audience} · {brief.minutes} 分钟，优先守住“{brief.priority}”。</p>
             </div>
           </div>
 
@@ -605,7 +685,7 @@ export function Workbench() {
                 <CandidateCard
                   key={candidate.id}
                   candidate={candidate}
-                  scene={scenesForCandidate(candidate.id, brief.mood, 1)[0]}
+                  scenes={scenesForCandidate(candidate.id, brief.mood, 3)}
                   selected={selectedId === candidate.id}
                   onSelect={() => selectCandidate(candidate.id)}
                 />
@@ -763,6 +843,18 @@ export function Workbench() {
                     <FileText className="h-4 w-4" aria-hidden="true" />
                     下载 JSON
                   </button>
+                  <button
+                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[var(--persimmon-500)] px-4 text-sm font-semibold text-white disabled:opacity-50 sm:col-span-2 xl:col-span-1"
+                    type="button"
+                    disabled={isPacking}
+                    onClick={() => void downloadProductionPackage()}
+                  >
+                    <PackageOpen className="h-4 w-4" aria-hidden="true" />
+                    {isPacking ? "正在整理制作包" : "下载完整制作包 ZIP"}
+                  </button>
+                </div>
+                <div className="mt-3 rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-[11px] leading-6 text-white/52">
+                  制作包包含可编辑剧本、分镜表、15 镜头清单、现场执行单、结构数据与 5 张路线视觉参考。
                 </div>
               </aside>
             </div>
@@ -866,7 +958,7 @@ export function Workbench() {
             <BrandMark className="h-9 w-9" decorative />
             <div><b className="text-sm">创剧 AI</b><p className="text-xs text-black/45">让每次改编都有依据</p></div>
           </div>
-          <p className="text-xs leading-6 text-black/45">本机保存 · 随时下载 · 反馈进入下一轮</p>
+          <p className="text-xs leading-6 text-black/45">原文有据 · 取舍可见 · 交付可执行</p>
           <a className="inline-flex min-h-11 items-center gap-2 text-xs font-semibold" href="#top">
             回到开头 <ChevronRight className="h-4 w-4 -rotate-90" aria-hidden="true" />
           </a>

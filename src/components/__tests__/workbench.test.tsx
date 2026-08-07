@@ -80,7 +80,7 @@ describe("Workbench", () => {
     expect(within(recommended).getByText(/都市情感类型/)).toBeInTheDocument();
     expect(screen.getAllByText("得到").length).toBeGreaterThanOrEqual(3);
     expect(screen.getAllByText("放弃").length).toBeGreaterThanOrEqual(3);
-    expect(screen.getAllByTestId("candidate-scene")).toHaveLength(4);
+    expect(screen.getAllByTestId("candidate-scene")).toHaveLength(12);
   });
 
   it("completes selection, editing, real download, and feedback-driven next round", async () => {
