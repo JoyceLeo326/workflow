@@ -1,5 +1,8 @@
 import type { NextConfig } from "next";
 
+const isPagesExport = process.env.GITHUB_PAGES === "1";
+const pagesRepository = process.env.GITHUB_REPOSITORY?.split("/").at(-1) ?? "workflow";
+const pagesBasePath = isPagesExport ? `/${pagesRepository}` : "";
 const offlineMode =
   process.env.NEXT_PUBLIC_OFFLINE_MODE ?? (process.env.VERCEL === "1" ? "1" : undefined);
 const providerOwnership = process.env.AI_PROVIDER_OWNERSHIP;
@@ -35,19 +38,35 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  ...(isPagesExport
+    ? {
+        output: "export" as const,
+        basePath: pagesBasePath,
+        pageExtensions: ["pages.tsx"],
+        trailingSlash: true,
+      }
+    : {}),
+  images: {
+    unoptimized: true,
+  },
   env: {
+    NEXT_PUBLIC_ASSET_BASE: pagesBasePath,
     NEXT_PUBLIC_OFFLINE_MODE: offlineMode ?? "0",
     NEXT_PUBLIC_COST_MODE: "zero_owner_cost",
     NEXT_PUBLIC_PROVIDER_STATUS: providerStatus,
   },
-  async headers() {
-    return [
-      {
-        source: "/:path*",
-        headers: securityHeaders,
-      },
-    ];
-  },
+  ...(!isPagesExport
+    ? {
+        async headers() {
+          return [
+            {
+              source: "/:path*",
+              headers: securityHeaders,
+            },
+          ];
+        },
+      }
+    : {}),
 };
 
 export default nextConfig;

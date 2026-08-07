@@ -2,7 +2,11 @@
 
 创剧 AI 面向小说改编、短剧编剧与前期制片。创作者贴入原文并写下受众、时长、节奏与制作约束后，可以比较不同创作路线，查看每条路线保留什么、放弃什么，再确认一份可编辑、可下载、可持续复盘的交付稿。
 
-[线上产品](https://chuangju-ai.vercel.app)
+[当前主入口｜GitHub Pages](https://joyceleo326.github.io/workflow/)
+
+[备用入口｜Vercel](https://chuangju-ai.vercel.app)
+
+主入口以完整静态产物发布，面向中国大陆网络使用时不依赖外部字体、CDN、AI API 或图片优化服务；实际可用性以访问时网络链路为准。
 
 ## 完整工作流
 
@@ -25,6 +29,8 @@
 - 当前浏览器中的版本恢复与反馈历史
 - Markdown、JSON 与完整 ZIP 制作包真实文件交付
 - 本地 SVG 品牌标志、自托管 WebP 影像与系统字体
+- GitHub Pages 完整静态主站与 Vercel 备用站
+- 精确哈希放行 hydration 脚本的 CSP；其余脚本与连接限同源，对象嵌入禁用
 - 凭据扫描、发布清单与外部运行时依赖检查
 
 ## 品牌系统
@@ -47,6 +53,10 @@ npm test
 npm run lint
 npm run build
 npm run test:e2e
+npm run build:pages
+npm run test:pages-artifact
+npm run security:pages
+npm run test:e2e:pages
 npm run build:public-mirror
 npm run test:public-mirror
 npm run security:secrets

@@ -15,11 +15,17 @@
 
 浏览器还会记录所有 HTTP(S) 请求并拒绝跨源运行时依赖；候选图与分镜图必须完成加载，且计算样式必须为 `object-fit: cover`。移动端会在输入框聚焦后把视口高度缩短到 520 像素，验证底部操作条隐藏且活动输入仍可进入视口。
 
+GitHub Pages 版本由同一套 `Workbench` 与故事引擎静态导出，产物门禁要求恰好包含 24 张互不重复的 WebP、零 API 路由、零图片优化端点、完整 `/workflow/` 资源前缀、无外部运行时依赖。构建会为每份 HTML 的 Next hydration 内联脚本生成精确 SHA-256 CSP 放行项，并限制连接、对象、基址与表单目标；`pages-desktop-1440` 与 `pages-mobile-320` 会监听 CSP 拒绝日志，再执行包含 ZIP 内容校验的完整旅程。
+
 ## 可复现命令
 
 ```bash
 npm ci
 npm run qa:devices
+npm run build:pages
+npm run test:pages-artifact
+npm run security:pages
+npm run test:e2e:pages
 ```
 
 复验固定线上地址时先保证本地已有浏览器运行时，再执行：
