@@ -1,12 +1,12 @@
 import { createHash } from "node:crypto";
-import { copyFile, mkdir, readFile, rm, stat, writeFile } from "node:fs/promises";
-import { basename, dirname, resolve } from "node:path";
+import { copyFile, cp, mkdir, readFile, readdir, rm, stat, writeFile } from "node:fs/promises";
+import { basename, dirname, relative, resolve } from "node:path";
 
 const root = process.cwd();
 const sourceDir = resolve(root, "mirror-src");
 const outputDir = resolve(root, "public-mirror");
 const publicPath = "/liujiarui-product-lab/mirrors/creative-ai/";
-const files = ["index.html", "styles.css", "app.js", "experience.js"];
+const files = ["index.html", "styles.css", "app.js", "experience.js", "scenes.js"];
 
 if (dirname(outputDir) !== root || basename(outputDir) !== "public-mirror") {
   throw new Error("Refusing to replace an unexpected public mirror directory.");
@@ -18,17 +18,34 @@ await mkdir(outputDir, { recursive: true });
 for (const file of files) {
   await copyFile(resolve(sourceDir, file), resolve(outputDir, file));
 }
+await cp(resolve(root, "public", "story-scenes"), resolve(outputDir, "story-scenes"), {
+  recursive: true,
+});
+await cp(resolve(root, "public", "brand"), resolve(outputDir, "brand"), {
+  recursive: true,
+});
 
 const inventory = [];
-for (const file of files) {
-  const pathname = resolve(outputDir, file);
+async function walk(directory) {
+  const entries = await readdir(directory, { withFileTypes: true });
+  const discovered = [];
+  for (const entry of entries) {
+    const pathname = resolve(directory, entry.name);
+    if (entry.isDirectory()) discovered.push(...await walk(pathname));
+    else if (entry.isFile() && entry.name !== "mirror-manifest.json") discovered.push(pathname);
+  }
+  return discovered;
+}
+
+for (const pathname of await walk(outputDir)) {
   const [content, info] = await Promise.all([readFile(pathname), stat(pathname)]);
   inventory.push({
-    path: file,
+    path: relative(outputDir, pathname).replaceAll("\\", "/"),
     bytes: info.size,
     sha256: createHash("sha256").update(content).digest("hex"),
   });
 }
+inventory.sort((left, right) => left.path.localeCompare(right.path));
 
 const manifest = {
   schemaVersion: 1,
@@ -37,6 +54,7 @@ const manifest = {
   assetBase: "./",
   publicPath,
   capabilities: [
+    "24 generated story scenes bound to decisions and feedback",
     "personalized source brief",
     "three traceable candidates with trade-offs",
     "explicit confirmation",

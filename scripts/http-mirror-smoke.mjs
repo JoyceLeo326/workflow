@@ -41,11 +41,13 @@ const previous = new Map(domGlobals.map((key) => [key, globalThis[key]]));
 let dom;
 
 try {
-  const [htmlResponse, stylesResponse, appResponse, experienceResponse] = await Promise.all([
+  const [htmlResponse, stylesResponse, appResponse, experienceResponse, scenesResponse, storyImageResponse] = await Promise.all([
     fetch(`${baseUrl}/index.html`),
     fetch(`${baseUrl}/styles.css`),
     fetch(`${baseUrl}/app.js`),
     fetch(`${baseUrl}/experience.js`),
+    fetch(`${baseUrl}/scenes.js`),
+    fetch(`${baseUrl}/story-scenes/rain-theatre-letter.webp`),
   ]);
 
   assert.equal(htmlResponse.status, 200);
@@ -53,12 +55,15 @@ try {
   assert.match(stylesResponse.headers.get("content-type") ?? "", /^text\/css/);
   assert.match(appResponse.headers.get("content-type") ?? "", /^text\/javascript/);
   assert.match(experienceResponse.headers.get("content-type") ?? "", /^text\/javascript/);
+  assert.match(scenesResponse.headers.get("content-type") ?? "", /^text\/javascript/);
+  assert.equal(storyImageResponse.status, 200);
 
-  const [html, styles, appSource, experienceSource] = await Promise.all([
+  const [html, styles, appSource, experienceSource, scenesSource] = await Promise.all([
     htmlResponse.text(),
     stylesResponse.text(),
     appResponse.text(),
     experienceResponse.text(),
+    scenesResponse.text(),
   ]);
   dom = new JSDOM(html, { url: `${baseUrl}/index.html`, pretendToBeVisual: true });
   Object.defineProperties(dom.window, {
@@ -83,9 +88,15 @@ try {
   });
 
   const engineUrl = `data:text/javascript;base64,${Buffer.from(experienceSource).toString("base64")}`;
-  const executableApp = appSource.replace('"./experience.js"', `"${engineUrl}"`);
-  assert.notEqual(executableApp, appSource, "App module must import the relative experience module.");
+  const scenesUrl = `data:text/javascript;base64,${Buffer.from(scenesSource).toString("base64")}`;
+  const executableApp = appSource
+    .replace('"./experience.js"', `"${engineUrl}"`)
+    .replace('"./scenes.js"', `"${scenesUrl}"`);
+  assert.notEqual(executableApp, appSource, "App module must import its relative runtime modules.");
   await import(`data:text/javascript;base64,${Buffer.from(executableApp).toString("base64")}#smoke`);
+
+  assert.equal(document.querySelectorAll("#atlas-grid img").length, 24);
+  assert.equal(document.querySelectorAll('img[src*="story-scenes"]').length, 28);
 
   const source = document.querySelector('[name="source"]');
   source.value = "她先关掉录音。门外的人敲了三次。她最后把那封信交给了最不该看见的人。";

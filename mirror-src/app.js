@@ -5,6 +5,7 @@ import {
   generateCandidates,
   normalizeMission,
 } from "./experience.js";
+import { STORY_SCENES, scenesForCandidate } from "./scenes.js";
 
 const STORAGE_KEY = "creative-ai-mirror-state-v1";
 const byId = (id) => document.getElementById(id);
@@ -55,9 +56,11 @@ function syncSourceCount() {
 
 function candidateMarkup(candidate, index) {
   const selected = state.selectedId === candidate.id;
+  const scene = scenesForCandidate(candidate.id, 1)[0];
   return `
     <button class="candidate-card" type="button" data-candidate="${escapeHtml(candidate.id)}" aria-pressed="${selected}">
       <span class="candidate-top"><small>${String(index + 1).padStart(2, "0")} · ${escapeHtml(candidate.badge)}</small><span class="candidate-score">${candidate.score}<i>/100</i></span></span>
+      <span class="candidate-scene"><img src="${scene.src}" alt="${escapeHtml(scene.alt)}" width="960" height="640" loading="lazy"><span><b>${scene.number}</b>${escapeHtml(scene.beat)}</span></span>
       <h3>${escapeHtml(candidate.title)}</h3>
       <p class="candidate-thesis">${escapeHtml(candidate.thesis)}</p>
       <span class="candidate-route"><small>开场动作</small><p>${escapeHtml(candidate.opening)}</p></span>
@@ -100,6 +103,12 @@ function renderDelivery({ shouldScroll = false } = {}) {
   byId("delivery-logline").textContent = delivery.logline;
   byId("delivery-tradeoff").textContent = delivery.decision.tradeoff;
   byId("delivery-check").textContent = delivery.nextCheck;
+  const confirmedScenes = scenesForCandidate(delivery.decision.candidateId, 5);
+  const confirmedScene = confirmedScenes[0];
+  byId("delivery-scene").src = confirmedScene.src;
+  byId("delivery-scene").alt = confirmedScene.alt;
+  byId("delivery-scene-number").textContent = `镜头 ${confirmedScene.number}`;
+  byId("delivery-scene-caption").textContent = confirmedScene.beat;
   byId("episode-timeline").innerHTML = delivery.sections
     .map(
       (item) => `<li><time>${escapeHtml(item.time)}</time><strong>${escapeHtml(item.name)}</strong><p>${escapeHtml(item.purpose)}<small>原文锚点：${escapeHtml(item.sourceAnchor)}</small></p></li>`,
@@ -119,6 +128,16 @@ function renderRevision() {
     byId("revision-action").textContent = latest.action;
     byId("revision-evidence").textContent = `观察证据：${latest.evidence}`;
   }
+  if (state.delivery) {
+    const revisionScenes = scenesForCandidate(state.delivery.decision.candidateId, 8);
+    const sceneIndex = latest ? (latest.version + latest.score) % revisionScenes.length : 1;
+    const revisionScene = revisionScenes[sceneIndex] ?? revisionScenes[0];
+    byId("review-scene").src = revisionScene.src;
+    byId("review-scene").alt = revisionScene.alt;
+    byId("review-scene-caption").textContent = latest
+      ? `第 ${latest.version} 版转向：${revisionScene.beat}`
+      : `待验证镜头：${revisionScene.beat}`;
+  }
   byId("review-history").innerHTML = revisions
     .map((revision) => `<span>V${revision.version} · ${escapeHtml(revision.outcome)}</span>`)
     .join("");
@@ -131,6 +150,31 @@ function restoreForm(mission) {
     if (field) field.value = String(value);
   }
   syncSourceCount();
+}
+
+function selectAtlasScene(scene) {
+  byId("atlas-feature-image").src = scene.src;
+  byId("atlas-feature-image").alt = scene.alt;
+  byId("atlas-feature-number").textContent = `SCENE ${scene.number} / 24`;
+  byId("atlas-feature-title").textContent = scene.title;
+  byId("atlas-feature-beat").textContent = scene.beat;
+  byId("atlas-grid").querySelectorAll("[data-scene]").forEach((button) => {
+    button.setAttribute("aria-pressed", String(button.dataset.scene === scene.id));
+  });
+}
+
+function renderAtlas() {
+  byId("atlas-grid").innerHTML = STORY_SCENES.map((scene, index) => `
+    <button type="button" role="listitem" data-scene="${scene.id}" aria-pressed="${index === 0}">
+      <img src="${scene.src}" alt="${escapeHtml(scene.alt)}" width="960" height="640" loading="lazy">
+      <span><b>${scene.number}</b><strong>${escapeHtml(scene.title)}</strong><small>${escapeHtml(scene.beat)}</small></span>
+    </button>`).join("");
+  byId("atlas-grid").querySelectorAll("[data-scene]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const scene = STORY_SCENES.find((item) => item.id === button.dataset.scene);
+      if (scene) selectAtlasScene(scene);
+    });
+  });
 }
 
 function downloadFile(filename, content, type) {
@@ -214,4 +258,5 @@ try {
   localStorage.removeItem(STORAGE_KEY);
 }
 
+renderAtlas();
 syncSourceCount();
