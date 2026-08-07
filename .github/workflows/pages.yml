@@ -30,6 +30,21 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Build Vercel-compatible static product
+        run: npm run build:vercel-static
+
+      - name: Verify Vercel-compatible static artifact
+        run: npm run test:vercel-artifact
+
+      - name: Scan Vercel-compatible static artifact for credentials
+        run: npm run security:vercel-static
+
+      - name: Install browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Verify root desktop and 320px complete journeys
+        run: npm run test:e2e:vercel-static
+
       - name: Build complete static product
         run: npm run build:pages
 
@@ -38,9 +53,6 @@ jobs:
 
       - name: Scan static artifact for credentials
         run: npm run security:pages
-
-      - name: Install browser
-        run: npx playwright install --with-deps chromium
 
       - name: Verify desktop and 320px complete journeys
         run: npm run test:e2e:pages

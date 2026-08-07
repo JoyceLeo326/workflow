@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const isPagesExport = process.env.GITHUB_PAGES === "1";
+const isVercelExport = process.env.VERCEL === "1";
+const isStaticProduction = isPagesExport || isVercelExport;
 const pagesRepository = process.env.GITHUB_REPOSITORY?.split("/").at(-1) ?? "workflow";
 const pagesBasePath = isPagesExport ? `/${pagesRepository}` : "";
 const offlineMode =
@@ -38,12 +40,12 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  ...(isPagesExport
+  ...(isStaticProduction
     ? {
         output: "export" as const,
-        basePath: pagesBasePath,
         pageExtensions: ["pages.tsx"],
         trailingSlash: true,
+        ...(isPagesExport ? { basePath: pagesBasePath } : {}),
       }
     : {}),
   images: {
@@ -55,7 +57,7 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_COST_MODE: "zero_owner_cost",
     NEXT_PUBLIC_PROVIDER_STATUS: providerStatus,
   },
-  ...(!isPagesExport
+  ...(!isStaticProduction
     ? {
         async headers() {
           return [

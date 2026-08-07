@@ -61,8 +61,16 @@ describe("public deployment readiness", () => {
         NEXT_PUBLIC_OFFLINE_MODE: "1",
         NEXT_PUBLIC_COST_MODE: "zero_owner_cost",
         NEXT_PUBLIC_PROVIDER_STATUS: "not_connected",
+        NEXT_PUBLIC_ASSET_BASE: "",
       });
-      expect(nextConfig.images).toMatchObject({ unoptimized: true });
+      expect(nextConfig).toMatchObject({
+        output: "export",
+        trailingSlash: true,
+        pageExtensions: ["pages.tsx"],
+        images: { unoptimized: true },
+      });
+      expect(nextConfig.basePath).toBeUndefined();
+      expect(nextConfig.headers).toBeUndefined();
     } finally {
       if (previousVercel === undefined) delete process.env.VERCEL;
       else process.env.VERCEL = previousVercel;
@@ -77,8 +85,10 @@ describe("public deployment readiness", () => {
   it("exports the complete client product for GitHub Pages without server routes", async () => {
     const previousPages = process.env.GITHUB_PAGES;
     const previousRepository = process.env.GITHUB_REPOSITORY;
+    const previousVercel = process.env.VERCEL;
     process.env.GITHUB_PAGES = "1";
     process.env.GITHUB_REPOSITORY = "JoyceLeo326/workflow";
+    delete process.env.VERCEL;
     vi.resetModules();
 
     try {
@@ -97,6 +107,8 @@ describe("public deployment readiness", () => {
       else process.env.GITHUB_PAGES = previousPages;
       if (previousRepository === undefined) delete process.env.GITHUB_REPOSITORY;
       else process.env.GITHUB_REPOSITORY = previousRepository;
+      if (previousVercel === undefined) delete process.env.VERCEL;
+      else process.env.VERCEL = previousVercel;
       vi.resetModules();
     }
   });
