@@ -90,6 +90,9 @@ for (const pathname of htmlFiles) {
     .map((match) => `'sha256-${createHash("sha256").update(match[2]).digest("base64")}'`)
     .filter((value, index, values) => values.indexOf(value) === index)
     .sort();
+  if (relative(root, pathname) === "index.html" && expectedHashes.length !== 5) {
+    throw new Error(`Expected 5 precisely hashed inline scripts, found ${expectedHashes.length}.`);
+  }
   const allowedHashes = scriptSources.filter((source) => source.startsWith("'sha256-")).sort();
   if (JSON.stringify(allowedHashes) !== JSON.stringify(expectedHashes)) {
     throw new Error(`Inline script hashes are incomplete or excessive in ${relative(root, pathname)}.`);
@@ -99,4 +102,4 @@ const html = await readFile(resolve(root, "index.html"), "utf8");
 if (!html.includes(`${basePath}/_next/`)) throw new Error("Next assets are not scoped to the deployment base path.");
 if (!html.includes(`${basePath}/story-scenes/`)) throw new Error("Story scenes are not scoped to the deployment base path.");
 
-console.log(`${target === "pages" ? "Pages" : "Vercel"} static artifact gate passed: ${names.length} files, 24 unique story scenes, no APIs or external runtime dependencies.`);
+console.log(`${target === "pages" ? "Pages" : "Vercel"} static artifact gate passed: ${names.length} files, 24 unique story scenes, 5 precisely hashed inline scripts, no APIs or external runtime dependencies.`);

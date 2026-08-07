@@ -63,6 +63,9 @@ test("creation, decision, delivery, export, and feedback survive every target vi
   });
 
   await page.goto(process.env.PLAYWRIGHT_ENTRY_PATH ?? "/");
+  if (process.env.PLAYWRIGHT_EXPECT_CSP === "1") {
+    await expect(page.locator('meta[http-equiv="Content-Security-Policy"]')).toHaveCount(1);
+  }
   await expect(page.getByRole("heading", { name: "让每个改编选择，都有原文依据。" })).toBeVisible();
   expect(page.viewportSize()?.width).toBe(expectedViewport?.width);
   await expect(page.getByText(String.fromCodePoint(0x767b, 0x5f55), { exact: true })).toHaveCount(0);
