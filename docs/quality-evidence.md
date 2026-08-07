@@ -17,11 +17,17 @@
 
 GitHub Pages 版本由同一套 `Workbench` 与故事引擎静态导出，产物门禁要求恰好包含 24 张互不重复的 WebP、零 API 路由、零图片优化端点、完整 `/workflow/` 资源前缀、无外部运行时依赖。构建会为每份 HTML 的 Next hydration 内联脚本生成精确 SHA-256 CSP 放行项，并限制连接、对象、基址与表单目标；`pages-desktop-1440` 与 `pages-mobile-320` 会监听 CSP 拒绝日志，再执行包含 ZIP 内容校验的完整旅程。
 
+Vercel 使用同一静态导出链路，但固定在根路径。`vercel-desktop-1440` 与 `vercel-mobile-320` 对根路径执行同一完整旅程；Vercel 产物门禁同样拒绝 API 路由、图片优化端点、缺失 CSP、跨源运行时和非唯一故事图。部署后还需以 `vercel inspect` 确认输出不含函数。
+
 ## 可复现命令
 
 ```bash
 npm ci
 npm run qa:devices
+npm run build:vercel-static
+npm run test:vercel-artifact
+npm run security:vercel-static
+npm run test:e2e:vercel-static
 npm run build:pages
 npm run test:pages-artifact
 npm run security:pages

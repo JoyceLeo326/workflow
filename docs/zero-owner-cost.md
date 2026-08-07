@@ -31,11 +31,11 @@
 
 ### Vercel 个人产品运行
 
-本仓库的 Vercel 配置只面向个人、非商业产品运行。Vercel Hobby 条款明确限制为个人或非商业用途，且平台可调整限制；商业使用前必须重新评估计划与合同：[Vercel Terms of Service](https://vercel.com/legal/terms)。公开产品默认使用浏览器本地规则，不依赖持久文件系统或付费 Provider。
+本仓库的 Vercel 配置只面向个人、非商业产品运行。Vercel Hobby 条款明确限制为个人或非商业用途，且平台可调整限制；商业使用前必须重新评估计划与合同：[Vercel Terms of Service](https://vercel.com/legal/terms)。公开入口部署为完整静态产物，不生成服务端函数、API 路由或图片优化调用；交互状态与导出均在浏览器内完成。
 
 ### Cloudflare Pages / Workers
 
-静态发布可评估 Cloudflare Pages；需要函数时，Pages Functions 按 Workers 计量。当前 Next.js API 路由与本地文件存储不能直接假定兼容，迁移前必须选择官方支持的适配或拆分为静态前端与 Workers API，并继续执行 fail-closed 配额策略。
+静态发布可评估 Cloudflare Pages；需要函数时，Pages Functions 按 Workers 计量。仓库保留的扩展 API 源码与本地文件存储不进入公开部署，也不能直接假定兼容；迁移前必须选择官方支持的适配或拆分为静态前端与 Workers API，并继续执行 fail-closed 配额策略。
 
 截至 2026-07-23，官方页面列出的 Free 示例包括 Pages 每月 500 次构建，以及 Workers 每日 100,000 次请求并在 UTC 00:00 重置。**配额数字会变化**，不得把这些数字硬编码为永久保证；部署前以官方页面为准：
 

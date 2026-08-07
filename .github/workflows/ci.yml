@@ -30,6 +30,21 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Build Vercel static product
+        run: npm run build:vercel-static
+
+      - name: Verify Vercel static artifact
+        run: npm run test:vercel-artifact
+
+      - name: Block exposed credentials in Vercel static artifact
+        run: npm run security:vercel-static
+
+      - name: Install browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Verify Vercel root desktop and 320px journeys
+        run: npm run test:e2e:vercel-static
+
       - name: Build GitHub Pages product
         run: npm run build:pages
 
@@ -38,6 +53,9 @@ jobs:
 
       - name: Block exposed credentials in GitHub Pages artifact
         run: npm run security:pages
+
+      - name: Verify Pages desktop and 320px journeys
+        run: npm run test:e2e:pages
 
       - name: Build public static compatibility mode
         run: npm run build:public-mirror

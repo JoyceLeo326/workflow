@@ -5,9 +5,11 @@ import { extname, resolve, sep } from "node:path";
 
 const root = resolve(process.cwd(), "out");
 const repository = process.env.GITHUB_REPOSITORY?.split("/").at(-1) ?? "workflow";
-const basePath = `/${repository}`;
 const portIndex = process.argv.indexOf("--port");
+const basePathIndex = process.argv.indexOf("--base-path");
 const port = Number(portIndex >= 0 ? process.argv[portIndex + 1] : 4277);
+const requestedBasePath = basePathIndex >= 0 ? process.argv[basePathIndex + 1] : `/${repository}`;
+const basePath = requestedBasePath === "/" ? "" : requestedBasePath.replace(/\/$/, "");
 const mime = {
   ".css": "text/css; charset=utf-8",
   ".html": "text/html; charset=utf-8",
@@ -22,12 +24,12 @@ const mime = {
 createServer(async (request, response) => {
   try {
     const url = new URL(request.url ?? "/", "http://127.0.0.1");
-    if (url.pathname === basePath) {
+    if (basePath && url.pathname === basePath) {
       response.writeHead(308, { Location: `${basePath}/` });
       response.end();
       return;
     }
-    if (!url.pathname.startsWith(`${basePath}/`)) {
+    if (basePath && !url.pathname.startsWith(`${basePath}/`)) {
       response.writeHead(404);
       response.end("Not found");
       return;
@@ -52,5 +54,5 @@ createServer(async (request, response) => {
     response.end("Not found");
   }
 }).listen(port, "127.0.0.1", () => {
-  console.log(`Pages export available at http://127.0.0.1:${port}${basePath}/`);
+  console.log(`Static export available at http://127.0.0.1:${port}${basePath}/`);
 });

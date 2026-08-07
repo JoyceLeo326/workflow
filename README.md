@@ -6,7 +6,7 @@
 
 [备用入口｜Vercel](https://chuangju-ai.vercel.app)
 
-主入口以完整静态产物发布，面向中国大陆网络使用时不依赖外部字体、CDN、AI API 或图片优化服务；实际可用性以访问时网络链路为准。
+两个公开入口均以同一套完整静态产品发布：Pages 使用 `/workflow/` 路径，Vercel 使用根路径；两者都不包含服务端函数、公开 API 路由、外部字体、CDN 或图片优化服务。实际可用性以访问时网络链路为准。
 
 ## 完整工作流
 
@@ -29,7 +29,7 @@
 - 当前浏览器中的版本恢复与反馈历史
 - Markdown、JSON 与完整 ZIP 制作包真实文件交付
 - 本地 SVG 品牌标志、自托管 WebP 影像与系统字体
-- GitHub Pages 完整静态主站与 Vercel 备用站
+- GitHub Pages 完整静态主站与 Vercel 根路径完整静态备用站
 - 精确哈希放行 hydration 脚本的 CSP；其余脚本与连接限同源，对象嵌入禁用
 - 凭据扫描、发布清单与外部运行时依赖检查
 
@@ -53,6 +53,10 @@ npm test
 npm run lint
 npm run build
 npm run test:e2e
+npm run build:vercel-static
+npm run test:vercel-artifact
+npm run security:vercel-static
+npm run test:e2e:vercel-static
 npm run build:pages
 npm run test:pages-artifact
 npm run security:pages
@@ -69,7 +73,9 @@ npm run security:mirror
 
 `mirror-src/` 提供不依赖服务端或外部运行时资源的完整创作链路。`npm run build:public-mirror` 生成 `public-mirror/`，构建脚本会写入 SHA-256 清单并排除环境文件、服务端路由、模型凭据和用户数据。
 
-## 可选服务端接口
+## 独立扩展接口（不进入公开部署）
+
+下列源码仅供独立私有环境按需扩展；GitHub Pages 与 Vercel 的公开静态产物均通过构建隔离排除这些路由。
 
 - `POST /api/projects`：创建项目
 - `GET /api/projects`：读取项目列表

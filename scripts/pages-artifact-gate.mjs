@@ -3,8 +3,9 @@ import { readFile, readdir, stat } from "node:fs/promises";
 import { basename, relative, resolve, sep } from "node:path";
 
 const root = resolve(process.cwd(), "out");
+const target = process.argv.includes("--target=vercel") ? "vercel" : "pages";
 const repository = process.env.GITHUB_REPOSITORY?.split("/").at(-1) ?? "workflow";
-const basePath = `/${repository}`;
+const basePath = target === "pages" ? `/${repository}` : "";
 
 async function walk(directory) {
   const paths = [];
@@ -19,11 +20,12 @@ async function walk(directory) {
 
 const files = await walk(root);
 const names = files.map((pathname) => relative(root, pathname).replaceAll("\\", "/"));
-for (const required of ["index.html", ".nojekyll"]) {
-  if (!names.includes(required)) throw new Error(`Pages export is missing ${required}.`);
+const requiredFiles = target === "pages" ? ["index.html", ".nojekyll"] : ["index.html"];
+for (const required of requiredFiles) {
+  if (!names.includes(required)) throw new Error(`Static export is missing ${required}.`);
 }
 if (names.some((name) => name === "api" || name.startsWith("api/"))) {
-  throw new Error("Pages export must not contain server API routes.");
+  throw new Error("Static export must not contain server API routes.");
 }
 
 const scenes = files.filter((pathname) => /story-scenes[\\/].+\.webp$/i.test(pathname));
@@ -94,7 +96,7 @@ for (const pathname of htmlFiles) {
   }
 }
 const html = await readFile(resolve(root, "index.html"), "utf8");
-if (!html.includes(`${basePath}/_next/`)) throw new Error("Next assets are not scoped to the Pages base path.");
-if (!html.includes(`${basePath}/story-scenes/`)) throw new Error("Story scenes are not scoped to the Pages base path.");
+if (!html.includes(`${basePath}/_next/`)) throw new Error("Next assets are not scoped to the deployment base path.");
+if (!html.includes(`${basePath}/story-scenes/`)) throw new Error("Story scenes are not scoped to the deployment base path.");
 
-console.log(`Pages artifact gate passed: ${names.length} files, 24 unique story scenes, no APIs or external runtime dependencies.`);
+console.log(`${target === "pages" ? "Pages" : "Vercel"} static artifact gate passed: ${names.length} files, 24 unique story scenes, no APIs or external runtime dependencies.`);
