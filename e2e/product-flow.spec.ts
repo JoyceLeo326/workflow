@@ -44,16 +44,25 @@ test("creation, decision, delivery, export, and feedback survive every target vi
   page,
 }, testInfo) => {
   const expectedViewport = testInfo.project.use.viewport;
-  const mobile = testInfo.project.name.startsWith("mobile-");
+  const mobile = testInfo.project.name.includes("mobile-");
   const externalOrigins = new Set<string>();
+  const imageOptimizerRequests: string[] = [];
+  const cspViolations: string[] = [];
+  page.on("console", (message) => {
+    const text = message.text();
+    if (/content security policy|violates.*(?:script-src|connect-src|object-src)|refused to (?:load|connect|execute)/i.test(text)) {
+      cspViolations.push(text);
+    }
+  });
   page.on("request", (request) => {
     const url = new URL(request.url());
+    if (url.pathname.includes("/_next/image")) imageOptimizerRequests.push(url.pathname);
     if (!["http:", "https:"].includes(url.protocol)) return;
     const base = new URL(testInfo.project.use.baseURL as string);
     if (url.origin !== base.origin) externalOrigins.add(url.origin);
   });
 
-  await page.goto("/");
+  await page.goto(process.env.PLAYWRIGHT_ENTRY_PATH ?? "/");
   await expect(page.getByRole("heading", { name: "让每个改编选择，都有原文依据。" })).toBeVisible();
   expect(page.viewportSize()?.width).toBe(expectedViewport?.width);
   await expect(page.getByText(String.fromCodePoint(0x767b, 0x5f55), { exact: true })).toHaveCount(0);
@@ -191,6 +200,8 @@ test("creation, decision, delivery, export, and feedback survive every target vi
   await expectNoHorizontalOverflow(page);
   if (mobile) await expectTouchTargets(page);
   expect([...externalOrigins]).toEqual([]);
+  expect(imageOptimizerRequests).toEqual([]);
+  expect(cspViolations).toEqual([]);
 
   await testInfo.attach(`${testInfo.project.name}-full-flow`, {
     body: await page.screenshot({ fullPage: true }),

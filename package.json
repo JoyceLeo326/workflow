@@ -5,16 +5,20 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:pages": "node scripts/build-pages.mjs",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
     "test:e2e": "playwright test",
+    "test:e2e:pages": "playwright test --config playwright.pages.config.ts",
     "qa:devices": "npm run build && npm run test:e2e",
     "build:public-mirror": "node scripts/build-public-mirror.mjs",
     "test:public-mirror": "node scripts/http-mirror-smoke.mjs",
     "security:secrets": "node scripts/secret-guard.mjs . .next",
     "security:mirror": "node scripts/secret-guard.mjs public-mirror",
-    "quality": "npm run lint && npm test && npm run build && npm run test:e2e && npm run build:public-mirror && npm run test:public-mirror && npm run security:secrets && npm run security:mirror"
+    "security:pages": "node scripts/secret-guard.mjs out",
+    "test:pages-artifact": "node scripts/pages-artifact-gate.mjs",
+    "quality": "npm run lint && npm test && npm run build && npm run test:e2e && npm run build:pages && npm run test:pages-artifact && npm run security:pages && npm run test:e2e:pages && npm run build:public-mirror && npm run test:public-mirror && npm run security:secrets && npm run security:mirror"
   },
   "dependencies": {
     "docx": "^9.7.1",

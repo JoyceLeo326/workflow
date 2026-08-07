@@ -62,6 +62,7 @@ describe("public deployment readiness", () => {
         NEXT_PUBLIC_COST_MODE: "zero_owner_cost",
         NEXT_PUBLIC_PROVIDER_STATUS: "not_connected",
       });
+      expect(nextConfig.images).toMatchObject({ unoptimized: true });
     } finally {
       if (previousVercel === undefined) delete process.env.VERCEL;
       else process.env.VERCEL = previousVercel;
@@ -69,6 +70,33 @@ describe("public deployment readiness", () => {
       else process.env.NEXT_PUBLIC_OFFLINE_MODE = previousOfflineMode;
       if (previousCostMode === undefined) delete process.env.COST_MODE;
       else process.env.COST_MODE = previousCostMode;
+      vi.resetModules();
+    }
+  });
+
+  it("exports the complete client product for GitHub Pages without server routes", async () => {
+    const previousPages = process.env.GITHUB_PAGES;
+    const previousRepository = process.env.GITHUB_REPOSITORY;
+    process.env.GITHUB_PAGES = "1";
+    process.env.GITHUB_REPOSITORY = "JoyceLeo326/workflow";
+    vi.resetModules();
+
+    try {
+      const { default: nextConfig } = await import("../../../next.config");
+      expect(nextConfig).toMatchObject({
+        output: "export",
+        basePath: "/workflow",
+        trailingSlash: true,
+        pageExtensions: ["pages.tsx"],
+        images: { unoptimized: true },
+      });
+      expect(nextConfig.env).toMatchObject({ NEXT_PUBLIC_ASSET_BASE: "/workflow" });
+      expect(nextConfig.headers).toBeUndefined();
+    } finally {
+      if (previousPages === undefined) delete process.env.GITHUB_PAGES;
+      else process.env.GITHUB_PAGES = previousPages;
+      if (previousRepository === undefined) delete process.env.GITHUB_REPOSITORY;
+      else process.env.GITHUB_REPOSITORY = previousRepository;
       vi.resetModules();
     }
   });

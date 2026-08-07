@@ -42,6 +42,7 @@ import { scenesForCandidate, type StoryScene } from "@/lib/story-studio/scenes";
 
 const STORAGE_KEY = "chuangju.story-studio.v2";
 const MAX_SOURCE_FILE_BYTES = 10 * 1024 * 1024;
+const ASSET_BASE = process.env.NEXT_PUBLIC_ASSET_BASE ?? "";
 const DEFAULT_BRIEF = normalizeStoryBrief({
   sourceText:
     "雨夜，林澈回到旧城剧院。父亲留下的录音突然响起。阿岚劝他不要追查。林澈仍走上舞台。停电后，一封写着未来日期的信落在聚光灯下。",
@@ -83,6 +84,10 @@ function downloadBlob(filename: string, blob: Blob) {
 
 function safeFilename(value: string) {
   return value.replace(/[\\/:*?"<>|]+/g, "-").trim() || "chuangju-story";
+}
+
+function assetUrl(pathname: string) {
+  return `${ASSET_BASE}${pathname}`;
 }
 
 function SelectField({
@@ -144,9 +149,8 @@ function CandidateCard({
           data-testid="candidate-scene"
           height={800}
           loading="lazy"
-          quality={78}
           sizes="(max-width: 1023px) 100vw, 50vw"
-          src={scene.src}
+          src={assetUrl(scene.src)}
           width={1280}
         />
         <div className="flex min-h-9 items-center justify-between gap-3 px-4 py-2 text-[10px] text-white/70">
@@ -163,9 +167,8 @@ function CandidateCard({
                   data-testid="candidate-scene"
                   height={480}
                   loading="lazy"
-                  quality={72}
                   sizes="(max-width: 1023px) 50vw, 25vw"
-                  src={supportingScene.src}
+                  src={assetUrl(supportingScene.src)}
                   width={720}
                 />
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent px-3 pb-2 pt-8">
@@ -388,7 +391,7 @@ export function Workbench() {
       zip.file("delivery.json", buildStoryDownloads(delivery).json);
       zip.file("manifest.json", files.manifest);
       for (const scene of deliveryScenes) {
-        const response = await fetch(scene.src);
+        const response = await fetch(assetUrl(scene.src));
         if (!response.ok) throw new Error(`视觉素材读取失败：${scene.title}`);
         zip.file(`visuals/${scene.src.split("/").at(-1)}`, await response.arrayBuffer());
       }
@@ -497,9 +500,8 @@ export function Workbench() {
                     className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"
                     height={960}
                     priority={index === 0}
-                    quality={78}
                     sizes="(max-width: 1023px) 33vw, 16vw"
-                    src={scene.src}
+                    src={assetUrl(scene.src)}
                     width={640}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/5 to-transparent" />
@@ -754,9 +756,8 @@ export function Workbench() {
                           className="aspect-[4/3] h-auto w-full object-cover"
                           height={800}
                           loading="lazy"
-                          quality={76}
                           sizes="(max-width: 639px) 45vw, 18vw"
-                          src={scene.src}
+                          src={assetUrl(scene.src)}
                           width={1280}
                         />
                         <div className="p-2">

@@ -30,6 +30,15 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Build GitHub Pages product
+        run: npm run build:pages
+
+      - name: Verify GitHub Pages artifact
+        run: npm run test:pages-artifact
+
+      - name: Block exposed credentials in GitHub Pages artifact
+        run: npm run security:pages
+
       - name: Build public static compatibility mode
         run: npm run build:public-mirror
 
