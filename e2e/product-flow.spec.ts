@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { expect, test, type Page } from "@playwright/test";
+import JSZip from "jszip";
 
 async function expectNoHorizontalOverflow(page: Page) {
   const metrics = await page.evaluate(() => ({
@@ -81,7 +82,10 @@ test("creation, decision, delivery, export, and feedback survive every target vi
     "data-recommended",
     "true",
   );
-  await expect(page.getByTestId("candidate-scene")).toHaveCount(4);
+  await expect(page.getByTestId("candidate-scene")).toHaveCount(12);
+  for (const image of await page.getByTestId("candidate-scene").all()) {
+    await image.scrollIntoViewIfNeeded();
+  }
   await expect
     .poll(() =>
       page.getByTestId("candidate-scene").evaluateAll((images) =>
@@ -149,6 +153,24 @@ test("creation, decision, delivery, export, and feedback survive every target vi
   };
   expect(exported.decision.candidateId).toBe("hook-first");
   expect(exported.logline).toContain("未来信");
+
+  const packagePromise = page.waitForEvent("download");
+  await page.getByRole("button", { name: "下载完整制作包 ZIP" }).click();
+  const packageDownload = await packagePromise;
+  const packagePath = testInfo.outputPath(packageDownload.suggestedFilename());
+  await packageDownload.saveAs(packagePath);
+  const archive = await JSZip.loadAsync(await readFile(packagePath));
+  for (const filename of [
+    "script.md",
+    "storyboard.csv",
+    "shot-list.csv",
+    "production-plan.md",
+    "delivery.json",
+    "manifest.json",
+  ]) {
+    expect(archive.file(filename), filename).not.toBeNull();
+  }
+  expect(Object.keys(archive.files).filter((name) => name.startsWith("visuals/") && name.endsWith(".webp"))).toHaveLength(5);
 
   await page.getByRole("radio", { name: "1 分" }).check();
   await page.getByLabel("最需要改变的地方").selectOption("人物动机偏弱");
