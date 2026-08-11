@@ -1,0 +1,964 @@
+{
+  "project": "workflow",
+  "version": 3,
+  "generatedBy": "OpenAI built-in imagegen, one call per asset",
+  "imageContract": {
+    "format": "webp",
+    "width": 768,
+    "height": 512,
+    "minimumAssets": 50,
+    "minimumCoreReachable": 20
+  },
+  "assets": [
+    {
+      "id": "workflow-v3-01",
+      "file": "public/story-v3/workflow-v3-01-intake.webp",
+      "phase": "intake",
+      "phaseLabel": "任务进入",
+      "person": "许澄",
+      "situation": "雨夜散场后，许澄抱着一册旧剧院题材的原稿回到长桌",
+      "action": "她把原稿放在绿色台灯下并摊开第一页",
+      "productState": "等待定义新的改编任务",
+      "outcome": "原文成为整个工作台唯一事实起点",
+      "alt": "许澄在雨夜旧剧院写作室的绿色台灯下摊开原稿",
+      "coreReachable": true,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 01: 许澄。雨夜散场后，许澄抱着一册旧剧院题材的原稿回到长桌；她把原稿放在绿色台灯下并摊开第一页。Product state: 等待定义新的改编任务。Visible outcome: 原文成为整个工作台唯一事实起点。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-02",
+      "file": "public/story-v3/workflow-v3-02-intake.webp",
+      "phase": "intake",
+      "phaseLabel": "任务进入",
+      "person": "顾言",
+      "situation": "第二天上午的讨论会临近，桌边摆着空白通告夹和机械钟",
+      "action": "顾言把时钟移到红色资料夹旁提醒截止时间",
+      "productState": "交付期限进入任务约束",
+      "outcome": "创作决定拥有清楚的时间边界",
+      "alt": "顾言把机械钟移到红色资料夹旁标记次日讨论期限",
+      "coreReachable": true,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 02: 顾言。第二天上午的讨论会临近，桌边摆着空白通告夹和机械钟；顾言把时钟移到红色资料夹旁提醒截止时间。Product state: 交付期限进入任务约束。Visible outcome: 创作决定拥有清楚的时间边界。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-03",
+      "file": "public/story-v3/workflow-v3-03-intake.webp",
+      "phase": "intake",
+      "phaseLabel": "任务进入",
+      "person": "许澄与顾言",
+      "situation": "一台竖屏手机与家庭电视取景框并排立在原稿旁",
+      "action": "两人交换摆放观众筹码并观察观看距离",
+      "productState": "目标受众与观看场景正在选择",
+      "outcome": "抽象受众被还原成真实的观看情境",
+      "alt": "两人比较竖屏手机和家庭电视对应的观看情境",
+      "coreReachable": true,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 03: 许澄与顾言。一台竖屏手机与家庭电视取景框并排立在原稿旁；两人交换摆放观众筹码并观察观看距离。Product state: 目标受众与观看场景正在选择。Visible outcome: 抽象受众被还原成真实的观看情境。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-04",
+      "file": "public/story-v3/workflow-v3-04-intake.webp",
+      "phase": "intake",
+      "phaseLabel": "任务进入",
+      "person": "许澄",
+      "situation": "三分钟沙漏旁堆着明显超量的故事卡",
+      "action": "许澄把多余故事卡移出沙漏边界",
+      "productState": "单集时长正在收敛",
+      "outcome": "篇幅限制开始影响路线而非留到交付时补救",
+      "alt": "许澄从三分钟沙漏旁移走超量故事卡",
+      "coreReachable": true,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 04: 许澄。三分钟沙漏旁堆着明显超量的故事卡；许澄把多余故事卡移出沙漏边界。Product state: 单集时长正在收敛。Visible outcome: 篇幅限制开始影响路线而非留到交付时补救。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-05",
+      "file": "public/story-v3/workflow-v3-05-intake.webp",
+      "phase": "intake",
+      "phaseLabel": "任务进入",
+      "person": "顾言",
+      "situation": "一封没有可读文字的未来日期道具信被压在原稿中央",
+      "action": "顾言戴棉手套把信封推到必留区域",
+      "productState": "不可丢失的原文物证被标记",
+      "outcome": "所有候选路线都必须保留未来来信",
+      "alt": "顾言把无字未来来信道具推到原稿中央作为必留物证",
+      "coreReachable": true,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 05: 顾言。一封没有可读文字的未来日期道具信被压在原稿中央；顾言戴棉手套把信封推到必留区域。Product state: 不可丢失的原文物证被标记。Visible outcome: 所有候选路线都必须保留未来来信。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-06",
+      "file": "public/story-v3/workflow-v3-06-intake.webp",
+      "phase": "intake",
+      "phaseLabel": "任务进入",
+      "person": "许澄",
+      "situation": "本地文稿导入后，投影墙只显示无字段落色块",
+      "action": "许澄一手按住原稿，一手用触控板逐段核对",
+      "productState": "原文已在本地读取",
+      "outcome": "工作台只依据当前导入材料建立任务",
+      "alt": "许澄对照纸质原稿核对投影墙上的无字段落色块",
+      "coreReachable": true,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 06: 许澄。本地文稿导入后，投影墙只显示无字段落色块；许澄一手按住原稿，一手用触控板逐段核对。Product state: 原文已在本地读取。Visible outcome: 工作台只依据当前导入材料建立任务。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-07",
+      "file": "public/story-v3/workflow-v3-07-intake.webp",
+      "phase": "intake",
+      "phaseLabel": "任务进入",
+      "person": "许澄与顾言",
+      "situation": "林澈、阿岚与父亲录音三枚人物物件散在桌面",
+      "action": "两人用细绳连接人物与各自隐瞒的线索",
+      "productState": "人物关系与动机进入简报",
+      "outcome": "后续路线拥有一致的人物事实底座",
+      "alt": "两人用细绳连接三个人物物件与各自线索",
+      "coreReachable": true,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 07: 许澄与顾言。林澈、阿岚与父亲录音三枚人物物件散在桌面；两人用细绳连接人物与各自隐瞒的线索。Product state: 人物关系与动机进入简报。Visible outcome: 后续路线拥有一致的人物事实底座。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-08",
+      "file": "public/story-v3/workflow-v3-08-intake.webp",
+      "phase": "intake",
+      "phaseLabel": "任务进入",
+      "person": "顾言",
+      "situation": "剧院舞台、后台走廊与观众席三张地点卡占满桌面",
+      "action": "顾言把它们叠进一张旧剧院平面框内",
+      "productState": "单一地点制作限制被确认",
+      "outcome": "路线必须在同一剧院内部完成空间变化",
+      "alt": "顾言把舞台、后台和观众席地点卡叠进同一剧院平面框",
+      "coreReachable": true,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 08: 顾言。剧院舞台、后台走廊与观众席三张地点卡占满桌面；顾言把它们叠进一张旧剧院平面框内。Product state: 单一地点制作限制被确认。Visible outcome: 路线必须在同一剧院内部完成空间变化。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-09",
+      "file": "public/story-v3/workflow-v3-09-intake.webp",
+      "phase": "intake",
+      "phaseLabel": "任务进入",
+      "person": "许澄",
+      "situation": "冷峻、温暖与荒诞三枚色片摆在第一人称与第三人称视角镜片旁",
+      "action": "许澄选择冷色片并把第三人称镜片放在其上",
+      "productState": "情绪底色与叙事视角完成选择",
+      "outcome": "视觉方向与叙述距离变得可执行",
+      "alt": "许澄把冷色片与第三人称视角镜片组合起来",
+      "coreReachable": true,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 09: 许澄。冷峻、温暖与荒诞三枚色片摆在第一人称与第三人称视角镜片旁；许澄选择冷色片并把第三人称镜片放在其上。Product state: 情绪底色与叙事视角完成选择。Visible outcome: 视觉方向与叙述距离变得可执行。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-10",
+      "file": "public/story-v3/workflow-v3-10-intake.webp",
+      "phase": "intake",
+      "phaseLabel": "任务进入",
+      "person": "许澄与顾言",
+      "situation": "受众、时长、必留信件、人物和单地点约束排列成一条任务带",
+      "action": "两人共同扣上绿色确认夹",
+      "productState": "故事简报已完成并可生成路线",
+      "outcome": "输入阶段以共同确认结束",
+      "alt": "两人给完整故事任务带扣上绿色确认夹",
+      "coreReachable": true,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 10: 许澄与顾言。受众、时长、必留信件、人物和单地点约束排列成一条任务带；两人共同扣上绿色确认夹。Product state: 故事简报已完成并可生成路线。Visible outcome: 输入阶段以共同确认结束。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-11",
+      "file": "public/story-v3/workflow-v3-11-evidence.webp",
+      "phase": "evidence",
+      "phaseLabel": "原文取证",
+      "person": "许澄",
+      "situation": "原稿中父亲录音出现的段落被放在便携录音机旁",
+      "action": "许澄用铅笔沿段落边缘做无字标记",
+      "productState": "关键声音线索获得原文锚点",
+      "outcome": "录音不会被误写成新增设定",
+      "alt": "许澄在录音机旁给原稿中的父亲录音段落做标记",
+      "coreReachable": true,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 11: 许澄。原稿中父亲录音出现的段落被放在便携录音机旁；许澄用铅笔沿段落边缘做无字标记。Product state: 关键声音线索获得原文锚点。Visible outcome: 录音不会被误写成新增设定。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-12",
+      "file": "public/story-v3/workflow-v3-12-evidence.webp",
+      "phase": "evidence",
+      "phaseLabel": "原文取证",
+      "person": "顾言",
+      "situation": "林澈和阿岚两枚人物卡之间隔着一封被隐藏的信",
+      "action": "顾言调整细绳显示劝阻与追查的对立",
+      "productState": "人物关系冲突被拆开",
+      "outcome": "路线可以解释阿岚为何阻止调查",
+      "alt": "顾言用细绳摆出林澈追查与阿岚劝阻的关系冲突",
+      "coreReachable": true,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 12: 顾言。林澈和阿岚两枚人物卡之间隔着一封被隐藏的信；顾言调整细绳显示劝阻与追查的对立。Product state: 人物关系冲突被拆开。Visible outcome: 路线可以解释阿岚为何阻止调查。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-13",
+      "file": "public/story-v3/workflow-v3-13-evidence.webp",
+      "phase": "evidence",
+      "phaseLabel": "原文取证",
+      "person": "许澄与顾言",
+      "situation": "旧剧院舞台、走廊和停电配电箱模型围成一圈",
+      "action": "两人把人物移动路径用脚印筹码连起来",
+      "productState": "场景地理完成核对",
+      "outcome": "动作不会无故穿越空间",
+      "alt": "两人在旧剧院模型上用脚印筹码核对人物路径",
+      "coreReachable": true,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 13: 许澄与顾言。旧剧院舞台、走廊和停电配电箱模型围成一圈；两人把人物移动路径用脚印筹码连起来。Product state: 场景地理完成核对。Visible outcome: 动作不会无故穿越空间。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-14",
+      "file": "public/story-v3/workflow-v3-14-evidence.webp",
+      "phase": "evidence",
+      "phaseLabel": "原文取证",
+      "person": "顾言",
+      "situation": "停电开关、录音机和聚光灯三件道具按时间顺序放置",
+      "action": "顾言先压下开关再把信封移到光束位置",
+      "productState": "停电到来信出现的因果链被标出",
+      "outcome": "悬念建立在可拍动作上",
+      "alt": "顾言依次操作停电开关、录音机和聚光灯下的信封",
+      "coreReachable": true,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 14: 顾言。停电开关、录音机和聚光灯三件道具按时间顺序放置；顾言先压下开关再把信封移到光束位置。Product state: 停电到来信出现的因果链被标出。Visible outcome: 悬念建立在可拍动作上。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-15",
+      "file": "public/story-v3/workflow-v3-15-evidence.webp",
+      "phase": "evidence",
+      "phaseLabel": "原文取证",
+      "person": "许澄",
+      "situation": "未来来信道具在聚光灯中，旁边只有原稿的对应段落",
+      "action": "许澄把其他推测卡全部移远",
+      "productState": "核心揭示与原文证据一一对应",
+      "outcome": "路线不会提前添加原文没有的解释",
+      "alt": "许澄只留下聚光灯下的来信和对应原稿段落",
+      "coreReachable": true,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 15: 许澄。未来来信道具在聚光灯中，旁边只有原稿的对应段落；许澄把其他推测卡全部移远。Product state: 核心揭示与原文证据一一对应。Visible outcome: 路线不会提前添加原文没有的解释。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-16",
+      "file": "public/story-v3/workflow-v3-16-evidence.webp",
+      "phase": "evidence",
+      "phaseLabel": "原文取证",
+      "person": "许澄与顾言",
+      "situation": "白色事实筹码与灰色推测筹码混在人物卡周围",
+      "action": "两人把两类筹码分到桌面两侧",
+      "productState": "原文事实与创作推断完成分离",
+      "outcome": "未知信息以明确假设呈现",
+      "alt": "两人把事实筹码和推测筹码分到黑桌两侧",
+      "coreReachable": true,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 16: 许澄与顾言。白色事实筹码与灰色推测筹码混在人物卡周围；两人把两类筹码分到桌面两侧。Product state: 原文事实与创作推断完成分离。Visible outcome: 未知信息以明确假设呈现。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-17",
+      "file": "public/story-v3/workflow-v3-17-evidence.webp",
+      "phase": "evidence",
+      "phaseLabel": "原文取证",
+      "person": "许澄",
+      "situation": "林澈返回剧院的动作卡前出现一个空缺位置",
+      "action": "许澄指向空缺并放下一枚问号形状但无文字的木筹码",
+      "productState": "人物动机缺口被识别",
+      "outcome": "后续路线必须补足动机而不能伪装已有答案",
+      "alt": "许澄在林澈返回剧院的动作链空缺处放下木筹码",
+      "coreReachable": true,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 17: 许澄。林澈返回剧院的动作卡前出现一个空缺位置；许澄指向空缺并放下一枚问号形状但无文字的木筹码。Product state: 人物动机缺口被识别。Visible outcome: 后续路线必须补足动机而不能伪装已有答案。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-18",
+      "file": "public/story-v3/workflow-v3-18-evidence.webp",
+      "phase": "evidence",
+      "phaseLabel": "原文取证",
+      "person": "顾言",
+      "situation": "原文事件被拆成返回、录音、劝阻、停电、来信五组画面卡",
+      "action": "顾言按发生顺序铺成长条",
+      "productState": "场景与时序整理完成",
+      "outcome": "路线比较拥有同一套事件基线",
+      "alt": "顾言把五组原文事件画面卡按时序铺成长条",
+      "coreReachable": true,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 18: 顾言。原文事件被拆成返回、录音、劝阻、停电、来信五组画面卡；顾言按发生顺序铺成长条。Product state: 场景与时序整理完成。Visible outcome: 路线比较拥有同一套事件基线。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-19",
+      "file": "public/story-v3/workflow-v3-19-evidence.webp",
+      "phase": "evidence",
+      "phaseLabel": "原文取证",
+      "person": "许澄",
+      "situation": "每张事件卡旁都放着一小段原稿纸条",
+      "action": "许澄逐张用纸夹把事件与来源夹在一起",
+      "productState": "所有建议获得来源定位",
+      "outcome": "交付稿可以回到具体原文片段",
+      "alt": "许澄用纸夹把每张事件卡与对应原稿纸条夹在一起",
+      "coreReachable": true,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 19: 许澄。每张事件卡旁都放着一小段原稿纸条；许澄逐张用纸夹把事件与来源夹在一起。Product state: 所有建议获得来源定位。Visible outcome: 交付稿可以回到具体原文片段。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-20",
+      "file": "public/story-v3/workflow-v3-20-evidence.webp",
+      "phase": "evidence",
+      "phaseLabel": "原文取证",
+      "person": "许澄与顾言",
+      "situation": "人物、地点、物证、时序与未知缺口组成五列证据板",
+      "action": "两人退后从同一距离复核",
+      "productState": "核心取证阶段可从主流程直接到达",
+      "outcome": "四条路线将接受同一证据底座",
+      "alt": "两人退后平视五列完整证据板",
+      "coreReachable": true,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 20: 许澄与顾言。人物、地点、物证、时序与未知缺口组成五列证据板；两人退后从同一距离复核。Product state: 核心取证阶段可从主流程直接到达。Visible outcome: 四条路线将接受同一证据底座。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-21",
+      "file": "public/story-v3/workflow-v3-21-compare.webp",
+      "phase": "compare",
+      "phaseLabel": "路线取舍",
+      "person": "许澄与顾言",
+      "situation": "四张同尺寸路线卡等距摆在长桌上",
+      "action": "两人把同一组证据夹分别放到每条路线旁",
+      "productState": "四条候选路线并列出现",
+      "outcome": "视觉层级不会替创作者做选择",
+      "alt": "两人让四张路线卡与同一组证据夹等距对齐",
+      "coreReachable": false,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 21: 许澄与顾言。四张同尺寸路线卡等距摆在长桌上；两人把同一组证据夹分别放到每条路线旁。Product state: 四条候选路线并列出现。Visible outcome: 视觉层级不会替创作者做选择。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-22",
+      "file": "public/story-v3/workflow-v3-22-compare.webp",
+      "phase": "compare",
+      "phaseLabel": "路线取舍",
+      "person": "许澄",
+      "situation": "第一条路线把未来来信画面放在最前，录音与劝阻后置",
+      "action": "许澄将信封卡推到首帧位置",
+      "productState": "悬念钩子路线获得最快揭示",
+      "outcome": "观众先被问题抓住但人物动机展开更短",
+      "alt": "许澄把未来来信卡推到悬念路线的首帧",
+      "coreReachable": false,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 22: 许澄。第一条路线把未来来信画面放在最前，录音与劝阻后置；许澄将信封卡推到首帧位置。Product state: 悬念钩子路线获得最快揭示。Visible outcome: 观众先被问题抓住但人物动机展开更短。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-23",
+      "file": "public/story-v3/workflow-v3-23-compare.webp",
+      "phase": "compare",
+      "phaseLabel": "路线取舍",
+      "person": "顾言",
+      "situation": "第二条路线让林澈与阿岚的对视先于信件出现",
+      "action": "顾言把两张人物卡靠近并延后物证",
+      "productState": "关系回声路线强化人物牵引",
+      "outcome": "情感因果更完整但钩子到来更慢",
+      "alt": "顾言把林澈与阿岚的对视卡放在关系路线最前",
+      "coreReachable": false,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 23: 顾言。第二条路线让林澈与阿岚的对视先于信件出现；顾言把两张人物卡靠近并延后物证。Product state: 关系回声路线强化人物牵引。Visible outcome: 情感因果更完整但钩子到来更慢。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-24",
+      "file": "public/story-v3/workflow-v3-24-compare.webp",
+      "phase": "compare",
+      "phaseLabel": "路线取舍",
+      "person": "许澄",
+      "situation": "第三条路线把剧院员工与旧观众的动作卡交叉排列",
+      "action": "许澄交替放置四组人物卡",
+      "productState": "群像交叉路线扩大世界",
+      "outcome": "信息密度更高并增加拍摄调度",
+      "alt": "许澄交替排列剧院群像人物卡形成交叉路线",
+      "coreReachable": false,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 24: 许澄。第三条路线把剧院员工与旧观众的动作卡交叉排列；许澄交替放置四组人物卡。Product state: 群像交叉路线扩大世界。Visible outcome: 信息密度更高并增加拍摄调度。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-25",
+      "file": "public/story-v3/workflow-v3-25-compare.webp",
+      "phase": "compare",
+      "phaseLabel": "路线取舍",
+      "person": "顾言",
+      "situation": "第四条路线只保留舞台和后台两块空间卡",
+      "action": "顾言把其他地点卡收进红色资料夹",
+      "productState": "单场地路线降低制作负担",
+      "outcome": "空间受限但声音与遮挡成为叙事资源",
+      "alt": "顾言收起多余地点卡，只留下舞台与后台",
+      "coreReachable": false,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 25: 顾言。第四条路线只保留舞台和后台两块空间卡；顾言把其他地点卡收进红色资料夹。Product state: 单场地路线降低制作负担。Visible outcome: 空间受限但声音与遮挡成为叙事资源。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-26",
+      "file": "public/story-v3/workflow-v3-26-compare.webp",
+      "phase": "compare",
+      "phaseLabel": "路线取舍",
+      "person": "许澄与顾言",
+      "situation": "每条路线旁同时摆着绿色收益筹码与柿红牺牲筹码",
+      "action": "两人逐条翻开两种筹码",
+      "productState": "收益与主动放弃同时可见",
+      "outcome": "选择不会只展示积极结果",
+      "alt": "两人逐条翻开四条路线的收益与牺牲筹码",
+      "coreReachable": false,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 26: 许澄与顾言。每条路线旁同时摆着绿色收益筹码与柿红牺牲筹码；两人逐条翻开两种筹码。Product state: 收益与主动放弃同时可见。Visible outcome: 选择不会只展示积极结果。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-27",
+      "file": "public/story-v3/workflow-v3-27-compare.webp",
+      "phase": "compare",
+      "phaseLabel": "路线取舍",
+      "person": "顾言",
+      "situation": "夜景灯具、群众演员与转场次数用实体筹码堆在路线旁",
+      "action": "顾言移走超出排期的筹码并比较剩余负担",
+      "productState": "拍摄成本进入排序",
+      "outcome": "制作可行性与叙事吸引力共同决定推荐",
+      "alt": "顾言比较四条路线旁的灯具、演员和转场负担筹码",
+      "coreReachable": false,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 27: 顾言。夜景灯具、群众演员与转场次数用实体筹码堆在路线旁；顾言移走超出排期的筹码并比较剩余负担。Product state: 拍摄成本进入排序。Visible outcome: 制作可行性与叙事吸引力共同决定推荐。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-28",
+      "file": "public/story-v3/workflow-v3-28-compare.webp",
+      "phase": "compare",
+      "phaseLabel": "路线取舍",
+      "person": "许澄",
+      "situation": "每条路线展开三张无字画面预览卡",
+      "action": "许澄从首帧到兑现依次指读",
+      "productState": "视觉节拍与路线论点完成对照",
+      "outcome": "画面承担解释而非停留在装饰",
+      "alt": "许澄依次查看四条路线的三张视觉节拍卡",
+      "coreReachable": false,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 28: 许澄。每条路线展开三张无字画面预览卡；许澄从首帧到兑现依次指读。Product state: 视觉节拍与路线论点完成对照。Visible outcome: 画面承担解释而非停留在装饰。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-29",
+      "file": "public/story-v3/workflow-v3-29-confirm.webp",
+      "phase": "confirm",
+      "phaseLabel": "选择确认",
+      "person": "许澄",
+      "situation": "四条路线仍全部可见，许澄停在关系回声路线前",
+      "action": "她把该路线卡向前推一掌距离",
+      "productState": "一条路线被明确选中但仍可撤回",
+      "outcome": "人类选择与系统推荐保持区分",
+      "alt": "许澄把关系回声路线卡向前推，其他三条仍可见",
+      "coreReachable": false,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 29: 许澄。四条路线仍全部可见，许澄停在关系回声路线前；她把该路线卡向前推一掌距离。Product state: 一条路线被明确选中但仍可撤回。Visible outcome: 人类选择与系统推荐保持区分。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-30",
+      "file": "public/story-v3/workflow-v3-30-confirm.webp",
+      "phase": "confirm",
+      "phaseLabel": "选择确认",
+      "person": "许澄与顾言",
+      "situation": "所选路线的收益与牺牲被同一个绿色确认环圈住",
+      "action": "顾言再次指向牺牲项，许澄点头按下确认夹",
+      "productState": "取舍获得显式确认",
+      "outcome": "系统只在接受代价后生成交付稿",
+      "alt": "顾言说明牺牲项后，许澄用确认环圈住所选路线的收益与代价",
+      "coreReachable": false,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 30: 许澄与顾言。所选路线的收益与牺牲被同一个绿色确认环圈住；顾言再次指向牺牲项，许澄点头按下确认夹。Product state: 取舍获得显式确认。Visible outcome: 系统只在接受代价后生成交付稿。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-31",
+      "file": "public/story-v3/workflow-v3-31-deliver.webp",
+      "phase": "deliver",
+      "phaseLabel": "交付成形",
+      "person": "许澄",
+      "situation": "空白交付页旁摆着所选路线与原文证据夹",
+      "action": "许澄写下一个无可读文字的短句结构并反复调整",
+      "productState": "一句话故事进入可编辑状态",
+      "outcome": "路线被压缩成可讨论的核心承诺",
+      "alt": "许澄对照路线和原文证据修改一句话故事卡",
+      "coreReachable": false,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 31: 许澄。空白交付页旁摆着所选路线与原文证据夹；许澄写下一个无可读文字的短句结构并反复调整。Product state: 一句话故事进入可编辑状态。Visible outcome: 路线被压缩成可讨论的核心承诺。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-32",
+      "file": "public/story-v3/workflow-v3-32-deliver.webp",
+      "phase": "deliver",
+      "phaseLabel": "交付成形",
+      "person": "许澄与顾言",
+      "situation": "返回、录音、劝阻、停电、来信五段故事卡沿桌面铺开",
+      "action": "两人调整每段长度并保持首尾相接",
+      "productState": "五段时序交付成形",
+      "outcome": "每一秒都有叙事任务与原文锚点",
+      "alt": "两人把五段故事卡调整成连续时序",
+      "coreReachable": false,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 32: 许澄与顾言。返回、录音、劝阻、停电、来信五段故事卡沿桌面铺开；两人调整每段长度并保持首尾相接。Product state: 五段时序交付成形。Visible outcome: 每一秒都有叙事任务与原文锚点。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-33",
+      "file": "public/story-v3/workflow-v3-33-deliver.webp",
+      "phase": "deliver",
+      "phaseLabel": "交付成形",
+      "person": "顾言",
+      "situation": "五张分镜卡用透视框排列在绿色台灯下",
+      "action": "顾言逐张检查人物朝向和视线衔接",
+      "productState": "路线分镜完成连续性检查",
+      "outcome": "视觉参考可以直接用于讨论镜头",
+      "alt": "顾言在绿色台灯下检查五张分镜卡的视线连续性",
+      "coreReachable": false,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 33: 顾言。五张分镜卡用透视框排列在绿色台灯下；顾言逐张检查人物朝向和视线衔接。Product state: 路线分镜完成连续性检查。Visible outcome: 视觉参考可以直接用于讨论镜头。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-34",
+      "file": "public/story-v3/workflow-v3-34-deliver.webp",
+      "phase": "deliver",
+      "phaseLabel": "交付成形",
+      "person": "许澄",
+      "situation": "十五枚镜头筹码按景别和动作排列在长条板上",
+      "action": "许澄把一枚重复镜头移出并重新编号位置但无文字",
+      "productState": "镜头清单完成去重与排序",
+      "outcome": "拍摄团队获得清楚的执行顺序",
+      "alt": "许澄从十五枚镜头筹码中移走重复项并重新排列",
+      "coreReachable": false,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 34: 许澄。十五枚镜头筹码按景别和动作排列在长条板上；许澄把一枚重复镜头移出并重新编号位置但无文字。Product state: 镜头清单完成去重与排序。Visible outcome: 拍摄团队获得清楚的执行顺序。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-35",
+      "file": "public/story-v3/workflow-v3-35-deliver.webp",
+      "phase": "deliver",
+      "phaseLabel": "交付成形",
+      "person": "顾言",
+      "situation": "灯光、道具、演员与场地四列执行卡摆在旧剧院平面图旁",
+      "action": "顾言逐列扣上检查夹",
+      "productState": "制作计划完成现场核对",
+      "outcome": "叙事选择被翻译成真实资源需求",
+      "alt": "顾言逐列核对灯光、道具、演员和场地执行卡",
+      "coreReachable": false,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 35: 顾言。灯光、道具、演员与场地四列执行卡摆在旧剧院平面图旁；顾言逐列扣上检查夹。Product state: 制作计划完成现场核对。Visible outcome: 叙事选择被翻译成真实资源需求。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-36",
+      "file": "public/story-v3/workflow-v3-36-deliver.webp",
+      "phase": "deliver",
+      "phaseLabel": "交付成形",
+      "person": "许澄",
+      "situation": "交付稿每一段旁都夹着一条原稿纸带",
+      "action": "许澄从末段反向检查到开场",
+      "productState": "来源追溯完成",
+      "outcome": "任何改写都能说明来自何处",
+      "alt": "许澄从结尾反向核对交付稿与每条原稿纸带",
+      "coreReachable": false,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 36: 许澄。交付稿每一段旁都夹着一条原稿纸带；许澄从末段反向检查到开场。Product state: 来源追溯完成。Visible outcome: 任何改写都能说明来自何处。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-37",
+      "file": "public/story-v3/workflow-v3-37-deliver.webp",
+      "phase": "deliver",
+      "phaseLabel": "交付成形",
+      "person": "许澄与顾言",
+      "situation": "两人在剧院走廊用竖屏手机查看交付稿缩略版",
+      "action": "许澄单手滚动，顾言检查底部操作是否遮挡内容",
+      "productState": "移动端复核通过",
+      "outcome": "工作流在窄屏仍可完成而不丢步骤",
+      "alt": "两人在旧剧院走廊用竖屏手机复核交付稿",
+      "coreReachable": false,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 37: 许澄与顾言。两人在剧院走廊用竖屏手机查看交付稿缩略版；许澄单手滚动，顾言检查底部操作是否遮挡内容。Product state: 移动端复核通过。Visible outcome: 工作流在窄屏仍可完成而不丢步骤。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-38",
+      "file": "public/story-v3/workflow-v3-38-deliver.webp",
+      "phase": "deliver",
+      "phaseLabel": "交付成形",
+      "person": "许澄",
+      "situation": "一叠暖白纸页与红色资料夹并排放在下载托盘",
+      "action": "许澄按下本地下载控制并接住纸页",
+      "productState": "Markdown 交付稿完成本地生成",
+      "outcome": "人可以直接阅读和批注当前版本",
+      "alt": "许澄从本地下载托盘接住 Markdown 交付纸页",
+      "coreReachable": false,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 38: 许澄。一叠暖白纸页与红色资料夹并排放在下载托盘；许澄按下本地下载控制并接住纸页。Product state: Markdown 交付稿完成本地生成。Visible outcome: 人可以直接阅读和批注当前版本。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-39",
+      "file": "public/story-v3/workflow-v3-39-deliver.webp",
+      "phase": "deliver",
+      "phaseLabel": "交付成形",
+      "person": "顾言",
+      "situation": "透明数据套里装着几何节点与时序块",
+      "action": "顾言把数据套放进交付箱",
+      "productState": "JSON 结构数据完成本地生成",
+      "outcome": "制作工具可以继续消费明确结构",
+      "alt": "顾言把几何节点时间线数据套放进交付箱",
+      "coreReachable": false,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 39: 顾言。透明数据套里装着几何节点与时序块；顾言把数据套放进交付箱。Product state: JSON 结构数据完成本地生成。Visible outcome: 制作工具可以继续消费明确结构。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-40",
+      "file": "public/story-v3/workflow-v3-40-deliver.webp",
+      "phase": "deliver",
+      "phaseLabel": "交付成形",
+      "person": "许澄与顾言",
+      "situation": "剧本、分镜、镜头表、执行单与五张视觉卡整齐叠放",
+      "action": "两人合上制作包并完成双手交接",
+      "productState": "完整 ZIP 制作包准备带走",
+      "outcome": "选择、依据与执行资料形成单一交付物",
+      "alt": "两人合上包含剧本、分镜、镜头表和视觉卡的制作包",
+      "coreReachable": false,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 40: 许澄与顾言。剧本、分镜、镜头表、执行单与五张视觉卡整齐叠放；两人合上制作包并完成双手交接。Product state: 完整 ZIP 制作包准备带走。Visible outcome: 选择、依据与执行资料形成单一交付物。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-41",
+      "file": "public/story-v3/workflow-v3-41-revise.webp",
+      "phase": "revise",
+      "phaseLabel": "反馈改版",
+      "person": "许澄、顾言与试读演员",
+      "situation": "三人在空舞台边围坐完成第一次桌读",
+      "action": "试读演员在人物转身离开处停下并看向两位主创",
+      "productState": "交付稿进入真实复看场景",
+      "outcome": "反馈来自具体观看和表演阻力",
+      "alt": "三人在空舞台边桌读，试读演员在人物转身处停下",
+      "coreReachable": false,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 41: 许澄、顾言与试读演员。三人在空舞台边围坐完成第一次桌读；试读演员在人物转身离开处停下并看向两位主创。Product state: 交付稿进入真实复看场景。Visible outcome: 反馈来自具体观看和表演阻力。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-42",
+      "file": "public/story-v3/workflow-v3-42-revise.webp",
+      "phase": "revise",
+      "phaseLabel": "反馈改版",
+      "person": "试读演员",
+      "situation": "五枚评分筹码前只亮起两枚，剧本仍摊开",
+      "action": "试读演员放下第三枚筹码并摇头",
+      "productState": "低评分被诚实记录",
+      "outcome": "系统打开下一轮而不掩盖当前问题",
+      "alt": "试读演员只点亮两枚评分筹码并看向摊开的剧本",
+      "coreReachable": false,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 42: 试读演员。五枚评分筹码前只亮起两枚，剧本仍摊开；试读演员放下第三枚筹码并摇头。Product state: 低评分被诚实记录。Visible outcome: 系统打开下一轮而不掩盖当前问题。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-43",
+      "file": "public/story-v3/workflow-v3-43-revise.webp",
+      "phase": "revise",
+      "phaseLabel": "反馈改版",
+      "person": "试读演员与许澄",
+      "situation": "林澈返回剧院的动作卡前仍有动机空缺",
+      "action": "试读演员指向空缺，许澄把问题筹码放在该位置",
+      "productState": "问题被归类为人物动机偏弱",
+      "outcome": "模糊不满意变成可定位的结构缺口",
+      "alt": "试读演员指出林澈返回剧院前的动机空缺，许澄放下问题筹码",
+      "coreReachable": false,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 43: 试读演员与许澄。林澈返回剧院的动作卡前仍有动机空缺；试读演员指向空缺，许澄把问题筹码放在该位置。Product state: 问题被归类为人物动机偏弱。Visible outcome: 模糊不满意变成可定位的结构缺口。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-44",
+      "file": "public/story-v3/workflow-v3-44-revise.webp",
+      "phase": "revise",
+      "phaseLabel": "反馈改版",
+      "person": "许澄",
+      "situation": "问题筹码、停顿位置与两枚评分筹码集中在一张观察卡旁",
+      "action": "许澄写下无可读文字的短记并夹到对应场次",
+      "productState": "具体反馈完成保存",
+      "outcome": "观察拥有位置、类型与确定结果",
+      "alt": "许澄把桌读观察卡夹到人物动机空缺对应场次",
+      "coreReachable": false,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 44: 许澄。问题筹码、停顿位置与两枚评分筹码集中在一张观察卡旁；许澄写下无可读文字的短记并夹到对应场次。Product state: 具体反馈完成保存。Visible outcome: 观察拥有位置、类型与确定结果。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-45",
+      "file": "public/story-v3/workflow-v3-45-revise.webp",
+      "phase": "revise",
+      "phaseLabel": "反馈改版",
+      "person": "许澄与顾言",
+      "situation": "四条路线重新回到桌面，关系回声路线移到首位",
+      "action": "两人依据动机反馈重新排序而不改原始证据",
+      "productState": "下一轮推荐发生变化",
+      "outcome": "反馈真正进入系统状态",
+      "alt": "两人依据人物动机反馈把关系回声路线重新排到首位",
+      "coreReachable": false,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 45: 许澄与顾言。四条路线重新回到桌面，关系回声路线移到首位；两人依据动机反馈重新排序而不改原始证据。Product state: 下一轮推荐发生变化。Visible outcome: 反馈真正进入系统状态。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-46",
+      "file": "public/story-v3/workflow-v3-46-revise.webp",
+      "phase": "revise",
+      "phaseLabel": "反馈改版",
+      "person": "许澄",
+      "situation": "第二场前只新增一张父亲录音反应卡",
+      "action": "许澄抽出旧卡并插入这一个动作",
+      "productState": "单一修订动作被执行",
+      "outcome": "下一版只验证人物返回的动机是否清楚",
+      "alt": "许澄在第二场前只插入一张父亲录音反应卡",
+      "coreReachable": false,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 46: 许澄。第二场前只新增一张父亲录音反应卡；许澄抽出旧卡并插入这一个动作。Product state: 单一修订动作被执行。Visible outcome: 下一版只验证人物返回的动机是否清楚。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-47",
+      "file": "public/story-v3/workflow-v3-47-revise.webp",
+      "phase": "revise",
+      "phaseLabel": "反馈改版",
+      "person": "许澄与顾言",
+      "situation": "V1 与 V2 两条故事带上下对齐，只有一处柿红色差异",
+      "action": "两人用指尖同时定位唯一变化",
+      "productState": "版本差异清楚可比较",
+      "outcome": "旧版本与原选择没有被覆盖",
+      "alt": "两人对齐两条故事带并指出唯一柿红色变化",
+      "coreReachable": false,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 47: 许澄与顾言。V1 与 V2 两条故事带上下对齐，只有一处柿红色差异；两人用指尖同时定位唯一变化。Product state: 版本差异清楚可比较。Visible outcome: 旧版本与原选择没有被覆盖。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-48",
+      "file": "public/story-v3/workflow-v3-48-revise.webp",
+      "phase": "revise",
+      "phaseLabel": "反馈改版",
+      "person": "顾言",
+      "situation": "新版路线旁再次摆出收益与牺牲筹码",
+      "action": "顾言重新阅读后放下绿色确认环",
+      "productState": "V2 取舍再次获得人类确认",
+      "outcome": "反馈驱动不会绕过责任边界",
+      "alt": "顾言为新版路线重新用确认环圈住收益与牺牲",
+      "coreReachable": false,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 48: 顾言。新版路线旁再次摆出收益与牺牲筹码；顾言重新阅读后放下绿色确认环。Product state: V2 取舍再次获得人类确认。Visible outcome: 反馈驱动不会绕过责任边界。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-49",
+      "file": "public/story-v3/workflow-v3-49-revise.webp",
+      "phase": "revise",
+      "phaseLabel": "反馈改版",
+      "person": "试读演员与许澄",
+      "situation": "第二次桌读进行到人物返回处，试读演员顺畅接上下一句动作",
+      "action": "试读演员点头并把第五枚评分筹码推给许澄",
+      "productState": "修订结果获得真实验证",
+      "outcome": "具体改动解决了被观察到的问题",
+      "alt": "第二次桌读中试读演员顺畅通过人物返回处并推来最高评分筹码",
+      "coreReachable": false,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 49: 试读演员与许澄。第二次桌读进行到人物返回处，试读演员顺畅接上下一句动作；试读演员点头并把第五枚评分筹码推给许澄。Product state: 修订结果获得真实验证。Visible outcome: 具体改动解决了被观察到的问题。The image must communicate this exact result visually without readable words."
+    },
+    {
+      "id": "workflow-v3-50",
+      "file": "public/story-v3/workflow-v3-50-revise.webp",
+      "phase": "revise",
+      "phaseLabel": "反馈改版",
+      "person": "许澄与顾言",
+      "situation": "清晨舞台光进入写作室，V1、反馈与 V2 依次放入红色版本夹",
+      "action": "两人合上版本夹并摊开下一份空白任务卡",
+      "productState": "本轮改编循环完成",
+      "outcome": "每次交付都成为下一轮有证据的起点",
+      "alt": "清晨写作室里两人归档 V1、反馈和 V2，并摊开新任务卡",
+      "coreReachable": false,
+      "width": 768,
+      "height": 512,
+      "usedIn": [
+        "src/lib/story-studio/visual-story-v3.ts"
+      ],
+      "prompt": "Use case: photorealistic-natural product storytelling for a Chinese screenplay adaptation workbench. Asset type: cinematic documentary still from one continuous story-development journey. Primary style: photorealistic editorial cinema, natural skin, fabric, paper and hand texture, restrained 35mm grain. Character continuity: Xu Cheng is a Chinese woman screenwriter in her early thirties with shoulder-length black hair, a rust cardigan, and a pencil behind one ear; Gu Yan is a Chinese male director in his mid thirties with short black hair, round glasses, and a charcoal overshirt. Location continuity: a writers room inside a repurposed old theatre, long black table, green glass lamp, red binder, fountain pen, projector, taped story cards, rain-streaked backstage window. Color continuity: near-black ink, warm paper, persimmon accents, jade practical light, grounded amber stage spill. Composition: landscape 3:2, medium-wide single scene, decisive hand action readable at thumbnail size, center and responsive edge crop safe. Constraints: no readable text, no letters or numbers, no logos, no watermarks, no brands, no floating interface, no collage, no split screen, anatomically plausible hands, one coherent frozen moment. Exact scene 50: 许澄与顾言。清晨舞台光进入写作室，V1、反馈与 V2 依次放入红色版本夹；两人合上版本夹并摊开下一份空白任务卡。Product state: 本轮改编循环完成。Visible outcome: 每次交付都成为下一轮有证据的起点。The image must communicate this exact result visually without readable words."
+    }
+  ]
+}

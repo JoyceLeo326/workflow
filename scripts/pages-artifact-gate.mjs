@@ -38,6 +38,20 @@ for (const scene of scenes) {
 }
 if (hashes.size !== scenes.length) throw new Error("Pages story scenes must be independently authored files.");
 
+const visualStoryV3Scenes = files.filter((pathname) => /story-v3[\\/].+\.webp$/i.test(pathname));
+if (visualStoryV3Scenes.length !== 50) {
+  throw new Error(`Expected 50 visual story v3 scenes, found ${visualStoryV3Scenes.length}.`);
+}
+const visualStoryV3Hashes = new Set();
+for (const scene of visualStoryV3Scenes) {
+  const [content, info] = await Promise.all([readFile(scene), stat(scene)]);
+  if (info.size < 20_000) throw new Error(`Visual story v3 scene is too small: ${basename(scene)}.`);
+  visualStoryV3Hashes.add(createHash("sha256").update(content).digest("hex"));
+}
+if (visualStoryV3Hashes.size !== visualStoryV3Scenes.length) {
+  throw new Error("Visual story v3 scenes must have unique image content.");
+}
+
 const runtimeFiles = files.filter((pathname) => /\.(?:html|js|css|json|txt)$/i.test(pathname));
 const runtimeText = (await Promise.all(runtimeFiles.map((pathname) => readFile(pathname, "utf8")))).join("\n");
 for (const marker of [
@@ -101,5 +115,6 @@ for (const pathname of htmlFiles) {
 const html = await readFile(resolve(root, "index.html"), "utf8");
 if (!html.includes(`${basePath}/_next/`)) throw new Error("Next assets are not scoped to the deployment base path.");
 if (!html.includes(`${basePath}/story-scenes/`)) throw new Error("Story scenes are not scoped to the deployment base path.");
+if (!html.includes(`${basePath}/story-v3/`)) throw new Error("Visual story v3 scenes are not scoped to the deployment base path.");
 
-console.log(`${target === "pages" ? "Pages" : "Vercel"} static artifact gate passed: ${names.length} files, 24 unique story scenes, 5 precisely hashed inline scripts, no APIs or external runtime dependencies.`);
+console.log(`${target === "pages" ? "Pages" : "Vercel"} static artifact gate passed: ${names.length} files, 24 original story scenes, 50 unique visual story v3 scenes, 5 precisely hashed inline scripts, no APIs or external runtime dependencies.`);
