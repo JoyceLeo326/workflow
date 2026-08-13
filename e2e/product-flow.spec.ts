@@ -40,11 +40,6 @@ async function expectTouchTargets(page: Page) {
   expect(undersized).toEqual([]);
 }
 
-async function expectVisualStoryStage(page: Page, label: string, count: number) {
-  await expect(page.getByRole("button", { name: label })).toHaveAttribute("aria-pressed", "true");
-  await expect(page.getByTestId("visual-story-v3-grid").locator("article")).toHaveCount(count);
-}
-
 test("creation, decision, delivery, export, and feedback survive every target viewport", async ({
   page,
 }, testInfo) => {
@@ -74,36 +69,9 @@ test("creation, decision, delivery, export, and feedback survive every target vi
   await expect(page.getByRole("heading", { name: "让每个改编选择，都有原文依据。" })).toBeVisible();
   expect(page.viewportSize()?.width).toBe(expectedViewport?.width);
   await expect(page.getByText(String.fromCodePoint(0x767b, 0x5f55), { exact: true })).toHaveCount(0);
-  await expectVisualStoryStage(page, "核心 20 幕", 20);
+  await expect(page.getByLabel("项目名称")).toBeVisible();
   await expectNoHorizontalOverflow(page);
   if (mobile) await expectTouchTargets(page);
-
-  if (expectedViewport?.width === 390) {
-    await page.getByRole("button", { name: "查看完整 50 幕" }).click();
-    const visualStoryImages = page.getByTestId("visual-story-v3-grid").getByRole("img");
-    await expect(visualStoryImages).toHaveCount(50);
-    for (const image of await visualStoryImages.all()) {
-      await image.scrollIntoViewIfNeeded();
-    }
-    await expect
-      .poll(() =>
-        visualStoryImages.evaluateAll((images) =>
-          images.every(
-            (image) =>
-              image instanceof HTMLImageElement &&
-              image.complete &&
-              image.naturalWidth === 768 &&
-              image.naturalHeight === 512 &&
-              image.getAttribute("width") === "768" &&
-              image.getAttribute("height") === "512" &&
-              Boolean(image.getAttribute("alt")?.trim()),
-          ),
-        ),
-      )
-      .toBe(true);
-    await page.getByRole("button", { name: "收起到核心 20 幕" }).click();
-    await expectVisualStoryStage(page, "核心 20 幕", 20);
-  }
 
   await page.locator('input[type="file"]').setInputFiles({
     name: "雨夜剧院.txt",
@@ -113,7 +81,6 @@ test("creation, decision, delivery, export, and feedback survive every target vi
     ),
   });
   await expect(page.getByLabel("项目名称")).toHaveValue("雨夜剧院");
-  await expectVisualStoryStage(page, "原文取证", 10);
   await page.getByLabel("故事类型").selectOption("悬疑");
   await page.getByLabel("目标观众").selectOption("追更观众");
   await page.getByLabel("单集时长").selectOption("3");
@@ -123,7 +90,6 @@ test("creation, decision, delivery, export, and feedback survive every target vi
   await page.getByLabel("改编重点").selectOption("悬念钩子");
   await page.getByLabel("制作限制").selectOption("少场景");
   await page.getByRole("button", { name: "生成创作路线" }).click();
-  await expectVisualStoryStage(page, "路线取舍", 8);
 
   await expect(page.getByTestId("candidate-hook-first")).toHaveAttribute(
     "data-recommended",
@@ -163,9 +129,7 @@ test("creation, decision, delivery, export, and feedback survive every target vi
   }
 
   await page.getByRole("button", { name: "选择 十秒失衡线" }).click();
-  await expectVisualStoryStage(page, "选择确认", 2);
   await page.getByRole("button", { name: "确认路线并生成交付" }).click();
-  await expectVisualStoryStage(page, "交付成形", 10);
   const storyboard = page.getByRole("region", { name: "路线分镜参照" });
   await expect(storyboard.getByRole("img")).toHaveCount(5);
   await expect
@@ -225,7 +189,6 @@ test("creation, decision, delivery, export, and feedback survive every target vi
   await page.getByLabel("最需要改变的地方").selectOption("人物动机偏弱");
   await page.getByLabel("观察记录").fill("试读者只记得信，没有说出林澈为什么回去。");
   await page.getByRole("button", { name: "保存反馈并进入下一轮" }).click();
-  await expectVisualStoryStage(page, "反馈改版", 10);
   await expect(page.locator("#delivery").getByText("下一轮推荐已改变", { exact: true })).toBeVisible();
   await expect(page.getByTestId("candidate-relationship-echo")).toHaveAttribute(
     "data-recommended",

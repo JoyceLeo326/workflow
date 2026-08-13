@@ -5,7 +5,7 @@ import { basename, dirname, relative, resolve } from "node:path";
 const root = process.cwd();
 const sourceDir = resolve(root, "mirror-src");
 const outputDir = resolve(root, "public-mirror");
-const publicPath = "/liujiarui-product-lab/mirrors/creative-ai/";
+const publicPath = "/workflow/mirrors/creative-ai/";
 const files = ["index.html", "styles.css", "app.js", "experience.js", "scenes.js"];
 
 if (dirname(outputDir) !== root || basename(outputDir) !== "public-mirror") {
