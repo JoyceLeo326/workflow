@@ -17,7 +17,6 @@ import {
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { BrandMark } from "@/components/brand-mark";
-import { VisualStoryV3 } from "@/components/visual-story-v3";
 import {
   applyStoryFeedback,
   buildStoryDelivery,
@@ -40,7 +39,6 @@ import {
 } from "@/lib/story-studio/engine";
 import { buildProductionPackageFiles } from "@/lib/story-studio/production-pack";
 import { scenesForCandidate, type StoryScene } from "@/lib/story-studio/scenes";
-import type { VisualStoryStage } from "@/lib/story-studio/visual-story-v3";
 
 const STORAGE_KEY = "chuangju.story-studio.v2";
 const MAX_SOURCE_FILE_BYTES = 10 * 1024 * 1024;
@@ -252,7 +250,6 @@ export function Workbench() {
   const [feedbackNote, setFeedbackNote] = useState("");
   const [isReadingFile, setIsReadingFile] = useState(false);
   const [isPacking, setIsPacking] = useState(false);
-  const [visualStoryStage, setVisualStoryStage] = useState<VisualStoryStage>("intake");
 
   const selectedCandidate = useMemo(
     () => candidates.find((candidate) => candidate.id === selectedId) ?? null,
@@ -299,8 +296,6 @@ export function Workbench() {
   function updateBrief<K extends keyof StoryBrief>(key: K, value: StoryBrief[K]) {
     setBrief((current) => ({ ...current, [key]: value }));
     setStatus("任务已改变，请重新生成路线");
-    if (key === "sourceText") setVisualStoryStage("evidence");
-    else setVisualStoryStage("intake");
   }
 
   async function handleSourceFile(file: File) {
@@ -323,7 +318,6 @@ export function Workbench() {
       updateBrief("sourceText", value);
       updateBrief("title", file.name.replace(/\.(txt|md|docx)$/i, ""));
       setStatus(`已读取 ${file.name}`);
-      setVisualStoryStage("evidence");
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "文件读取失败");
     } finally {
@@ -339,7 +333,6 @@ export function Workbench() {
     setSelectedId(null);
     setDelivery(null);
     setStatus(memory ? `第 ${memory.round} 轮路线已按反馈重排` : "四条路线已生成，请比较收益与代价");
-    setVisualStoryStage("compare");
     saveStudio({
       brief: normalized,
       candidates: nextCandidates,
@@ -352,7 +345,6 @@ export function Workbench() {
   function selectCandidate(candidateId: string) {
     setSelectedId(candidateId);
     setStatus("路线已选择，确认后生成可编辑交付稿");
-    setVisualStoryStage("confirm");
     saveStudio({ brief, candidates, selectedId: candidateId, delivery, memory });
   }
 
@@ -361,7 +353,6 @@ export function Workbench() {
     const nextDelivery = buildStoryDelivery(brief, selectedCandidate);
     setDelivery(nextDelivery);
     setStatus("路线已确认，交付稿可以编辑和下载");
-    setVisualStoryStage("deliver");
     saveStudio({ brief, candidates, selectedId, delivery: nextDelivery, memory });
   }
 
@@ -374,7 +365,6 @@ export function Workbench() {
     if (!delivery) return;
     const files = buildStoryDownloads(delivery);
     const base = safeFilename(brief.title);
-    setVisualStoryStage("deliver");
     if (kind === "markdown") {
       downloadFile(`${base}-第${delivery.version}版.md`, files.markdown, "text/markdown");
       setStatus("Markdown 交付稿已开始下载");
@@ -387,7 +377,6 @@ export function Workbench() {
   async function downloadProductionPackage() {
     if (!delivery || isPacking) return;
     setIsPacking(true);
-    setVisualStoryStage("deliver");
     setStatus("正在整理剧本、分镜与制作资料");
     try {
       const [{ default: JSZip }, files] = await Promise.all([
@@ -430,7 +419,6 @@ export function Workbench() {
     setSelectedId(null);
     setFeedbackNote("");
     setStatus("下一轮推荐已改变");
-    setVisualStoryStage("revise");
     saveStudio({
       brief,
       candidates: nextCandidates,
@@ -443,7 +431,7 @@ export function Workbench() {
   return (
     <main className="studio-shell min-h-[100dvh] overflow-x-hidden bg-[var(--paper-50)] text-[var(--ink-950)]">
       <header className="studio-header sticky top-0 z-40 border-b border-white/10 bg-[color:var(--ink-950)]/96 text-white backdrop-blur-xl">
-        <div className="mx-auto flex min-h-16 max-w-[1500px] items-center gap-3 px-4 py-2 sm:px-6">
+        <div className="mx-auto grid min-h-16 max-w-[1500px] grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 px-4 py-2 sm:px-6 md:flex">
           <a className="flex min-h-11 min-w-0 items-center gap-3" href="#top" aria-label="创剧 AI 首页">
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[var(--paper-50)] text-[var(--ink-950)]">
               <BrandMark className="h-8 w-8" decorative />
@@ -455,7 +443,7 @@ export function Workbench() {
               </small>
             </span>
           </a>
-          <nav className="ml-5 hidden items-center gap-1 md:flex" aria-label="主导航">
+          <nav className="order-3 col-span-2 flex max-w-full items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:order-none md:col-span-1 md:ml-5" aria-label="主导航">
             <a className="inline-flex min-h-11 items-center px-3 text-xs text-white/65 hover:text-white" href="#brief">
               写任务
             </a>
@@ -527,8 +515,6 @@ export function Workbench() {
           </div>
         </div>
       </section>
-
-      <VisualStoryV3 activeStage={visualStoryStage} key={visualStoryStage} />
 
       <section id="brief" className="mx-auto max-w-[1500px] scroll-mt-24 px-4 py-10 sm:px-6 lg:py-14">
         <div className="grid min-w-0 gap-6 xl:grid-cols-[.68fr_1.32fr]">
